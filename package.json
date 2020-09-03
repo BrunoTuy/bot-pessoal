@@ -1,0 +1,18 @@
+{
+  "name": "bot-pessoal",
+  "version": "0.1.0",
+  "description": "Bot assistente pessoal",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "contributors": [
+    {
+      "name": "Bruno Murta Tuy",
+      "email": "bruno@tuy.com.br"
+    }
+  ],
+  "dependencies": {
+    "mongojs": "^3.1.0",
+    "node-telegram-bot-api": "^0.50.0"
+  }
+}
