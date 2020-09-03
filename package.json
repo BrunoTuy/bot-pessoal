@@ -12,7 +12,7 @@
     }
   ],
   "dependencies": {
-    "mongojs": "^3.1.0",
+    "lowdb": "^1.0.0",
     "node-telegram-bot-api": "^0.50.0"
   }
 }
