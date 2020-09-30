@@ -11,11 +11,21 @@ const adapter = new FileSync( config.base.arquivo );
 const db = lowdb( adapter );
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
 
+db.defaults({
+  chats: {},
+  dinheiro: []
+}).write();
+
 bot.on( 'message', ( msg ) => {
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
 
+  const { ultimoComando, contexto } = db.get(`chats.${msg.chat.id}`).value()
   const parametros = msg.text ? msg.text.split( ' ' ) : [''];
-  const comando = parametros.indexOf('/') === 0 && parametros.shift().substring( 1 ).split( '@' )[0];
+  const comando = parametros[0].indexOf('/') === 0
+    ? parametros.shift().substring( 1 ).split( '@' )[0]
+    : ultimoComando && cmds[ultimoComando] && cmds[ultimoComando].context
+      ? ultimoComando
+      : false;
 
   if ( !comando || typeof cmds[comando] === 'undefined' || cmds[comando].exec  === 'undefined' ) {
     const resposta = [
@@ -40,9 +50,12 @@ bot.on( 'message', ( msg ) => {
       bot,
       config,
       comando,
+      contexto,
       parametros,
       original: msg,
       callback: ( resp ) => enviar( msg.chat.id, resp )
     });
+
+    db.set(`chats.${msg.chat.id}.ultimoComando`, comando).write();
   }
 });
