@@ -6,12 +6,15 @@ const cmds = require( './comandos' );
 const bot = new TelegramBot( config.tokenBot, {polling: true});
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
-const db = require( './lib/banco.js' )( config );
+const banco = require( './lib/banco.js' )( config );
+const sqlite = require( './lib/sqlite.js' );
+
+banco.sqlite = sqlite;
 
 bot.on( 'message', ( msg ) => {
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
 
-  const { ultimoComando, contexto } = db.get(`chats.${msg.chat.id}`).value()
+  const { ultimoComando, contexto } = banco.getChatVars(msg);
   const parametros = msg.text ? msg.text.split( ' ' ) : [''];
   const comando = parametros[0].indexOf('/') === 0
     ? parametros.shift().substring( 1 ).split( '@' )[0]
@@ -38,8 +41,8 @@ bot.on( 'message', ( msg ) => {
 
   if ( comando && cmds[comando] && cmds[comando].exec ) {
     cmds[comando].exec({
-      db,
       bot,
+      banco,
       config,
       comando,
       contexto,
@@ -48,6 +51,6 @@ bot.on( 'message', ( msg ) => {
       callback: ( resp ) => enviar( msg.chat.id, resp )
     });
 
-    db.set(`chats.${msg.chat.id}.ultimoComando`, comando).write();
+    banco.setChatVar(msg, 'ultimoComando', comando);
   }
 });

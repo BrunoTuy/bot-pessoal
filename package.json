@@ -13,6 +13,8 @@
   ],
   "dependencies": {
     "lowdb": "^1.0.0",
-    "node-telegram-bot-api": "^0.50.0"
+    "node-telegram-bot-api": "^0.50.0",
+    "sqlite": "^4.0.17",
+    "sqlite3": "^5.0.0"
   }
 }
