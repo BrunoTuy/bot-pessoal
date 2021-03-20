@@ -1,18 +1,33 @@
+const express = require('express');
 const TelegramBot = require( 'node-telegram-bot-api' );
 
-const config = require( './config.json' );
-const cmds = require( './comandos' );
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
-const bot = new TelegramBot( config.tokenBot, {polling: true});
+const comandos = require( './comandos' );
+
+const bot = new TelegramBot( process.env.TOKEN_TELEGRAM, {polling: true});
+const app = express();
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
-const banco = require( './lib/banco.js' )( config );
+const banco = require( './lib/banco.js' )();
 const sqlite = require( './lib/sqlite.js' );
 
 banco.sqlite = sqlite;
 
 bot.on( 'message', ( msg ) => {
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
+
+  const allowed = (process.env.CHAT_ALLOWED || '').split(',').includes(msg.chat.id.toString());
+  const cmds = {};
+
+  for ( key in comandos ) {
+    if ( allowed || !comandos[key].restricted )
+    {
+      cmds[key] = comandos[key];
+    }
+  }
 
   const { ultimoComando, contexto } = banco.getChatVars(msg);
   const parametros = msg.text ? msg.text.split( ' ' ) : [''];
@@ -22,7 +37,8 @@ bot.on( 'message', ( msg ) => {
       ? ultimoComando
       : false;
 
-  if ( !comando || typeof cmds[comando] === 'undefined' || cmds[comando].exec  === 'undefined' ) {
+  if ( !comando || typeof cmds[comando] === 'undefined' || cmds[comando].exec  === 'undefined' )
+  {
     const resposta = [
       `Oi ${msg.from.first_name}`,
       'O comando digitado não foi reconhecido',
@@ -31,7 +47,8 @@ bot.on( 'message', ( msg ) => {
     ];
 
     for ( key in cmds ) {
-      if ( cmds[key] && !cmds[key].ocultar ) {
+      if ( cmds[key] && !cmds[key].ocultar )
+      {
         resposta.push(`/${key}`);
       }
     }
@@ -42,8 +59,8 @@ bot.on( 'message', ( msg ) => {
   if ( comando && cmds[comando] && cmds[comando].exec ) {
     cmds[comando].exec({
       bot,
+      cmds,
       banco,
-      config,
       comando,
       contexto,
       parametros,
@@ -53,4 +70,11 @@ bot.on( 'message', ( msg ) => {
 
     banco.setChatVar(msg, 'ultimoComando', comando);
   }
+});
+
+app.set('port', (process.env.PORT || 5000));
+app.get('/', (request, response) => {
+  response.send('App is running');
+}).listen(app.get('port'), () => {
+  console.log('App is running, server is listening on port ', app.get('port'));
 });

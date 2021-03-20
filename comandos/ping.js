@@ -1,3 +1,8 @@
 module.exports = {
-  exec: ({ callback }) => callback( ' ~~ Pong ~~ ' )
+  exec: ({ callback, original }) => {
+    callback([
+      ' ~~ Pong ~~ ',
+      original.chat.id
+    ]);
+  }
 };

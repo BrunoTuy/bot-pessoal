@@ -58,3 +58,5 @@ package-lock.json
 
 sherok.json
 config.json
+.env
+*.sqlite

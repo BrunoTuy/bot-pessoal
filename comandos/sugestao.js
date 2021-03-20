@@ -18,7 +18,7 @@ const executarComando = ({ parametros, callback, config, bot, original }) => {
     const dadosChat = `${original.chat.type} ${(original.chat.title || original.chat.id)}`;
     const dadosUsuario = `${original.from.first_name} ${original.from.last_name} @${original.from.username} ${original.from.language_code}`;
 
-    bot.sendMessage( config.adminChat, `${momento}\n${dadosUsuario}\n${dadosChat}\n${parametros.join( ' ' )}` );
+    bot.sendMessage( process.env.CHAT_ADMIN, `${momento}\n${dadosUsuario}\n${dadosChat}\n${parametros.join( ' ' )}` );
   }
 };
 

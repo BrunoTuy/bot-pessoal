@@ -1,5 +1,4 @@
-const executarComando = ({ original, callback }) => {
-  const cmds = require( './' );
+const executarComando = ({ original, callback, cmds }) => {
   const resposta = [
     `Oi ${original.from.first_name}`,
     'Sou o bot pessoal do Bruno Tuy',
