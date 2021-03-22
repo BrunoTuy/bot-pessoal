@@ -16,8 +16,8 @@ const bot = new TelegramBot( process.env.TOKEN_TELEGRAM, botOptions);
 const app = express();
 
 if (process.env.NODE_ENV !== 'production') {
-  console.log('SET webHook url', `${process.env.APP_URL}/bot${process.env.TOKEN_TELEGRAM}`);
-  bot.setWebHook(`${process.env.APP_URL}/bot${process.env.TOKEN_TELEGRAM}`);
+  console.log('SET webHook url - https://bot-person.herokuapp.com/');
+  bot.setWebHook(`https://bot-person.herokuapp.com/`);
 }
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
