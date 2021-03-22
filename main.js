@@ -6,6 +6,7 @@ const botOptions = { polling: true };
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 } else {
+  console.log('SET webHook port', process.env.PORT);
   webHook: { port: process.env.PORT };
 }
 
@@ -15,6 +16,7 @@ const bot = new TelegramBot( process.env.TOKEN_TELEGRAM, botOptions);
 const app = express();
 
 if (process.env.NODE_ENV !== 'production') {
+  console.log('SET webHook url', `${process.env.APP_URL}/bot${process.env.TOKEN_TELEGRAM}`);
   bot.setWebHook(`${process.env.APP_URL}/bot${process.env.TOKEN_TELEGRAM}`);
 }
 
