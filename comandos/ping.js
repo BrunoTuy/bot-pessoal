@@ -1,8 +1,13 @@
 module.exports = {
-  exec: ({ callback, original }) => {
+  exec: async ({ bot, callback, original }) => {
+  	const resp = await = bot.getWebHookInfo();
+
+  	console.log('- Resposta getWebHookInfo', resp);
+
     callback([
       ' ~~ Pong ~~ ',
-      original.chat.id
+      original.chat.id,
+      JSON.stringify(resp)
     ]);
   }
 };
