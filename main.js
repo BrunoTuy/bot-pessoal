@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 } else {
   console.log('SET webHook port', process.env.PORT);
-  botOptions.webHook = { port: 443 };
+  botOptions.webHook = { port: process.env.PORT };
 }
 
 const comandos = require( './comandos' );
@@ -15,10 +15,10 @@ const comandos = require( './comandos' );
 const bot = new TelegramBot( process.env.TOKEN_TELEGRAM, botOptions);
 const app = express();
 
-// if (process.env.NODE_ENV === 'production') {
-//   console.log('SET webHook url', `https://bot-person.herokuapp.com/bot${process.env.TOKEN_TELEGRAM}`);
-//   bot.setWebHook(`https://bot-person.herokuapp.com/bot${process.env.TOKEN_TELEGRAM}`);
-// }
+if (process.env.NODE_ENV === 'production') {
+  console.log('SET webHook url', `https://bot-person.herokuapp.com/bot${process.env.TOKEN_TELEGRAM}`);
+  bot.setWebHook(`https://bot-person.herokuapp.com/bot${process.env.TOKEN_TELEGRAM}`);
+}
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
 const banco = require( './lib/banco.js' )();
