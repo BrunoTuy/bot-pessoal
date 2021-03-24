@@ -12,12 +12,14 @@ const serviceAccount = {
   client_x509_cert_url: process.env.FIREBASE_client_x509_cert_url
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
 const exec = async ({ callback }) => {
   callback('Conectar com o firestone');
+
+  console.log('--- "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-r7ddl%40livrocaixa-c872f.iam.gserviceaccount.com"', serviceAccount);
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
 
   const db = admin.firestore();
   const snapshot = await db.collection('cartoes').get();
