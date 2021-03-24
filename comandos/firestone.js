@@ -15,21 +15,24 @@ const serviceAccount = {
 const exec = async ({ callback }) => {
   callback('Conectar com o firestone');
 
-  console.log('--- "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-r7ddl%40livrocaixa-c872f.iam.gserviceaccount.com"', serviceAccount);
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
+    const db = admin.firestore();
+    const snapshot = await db.collection('cartoes').get();
 
-  const db = admin.firestore();
-  const snapshot = await db.collection('cartoes').get();
+    await snapshot.forEach((doc) => {
+      console.log(doc.id, '=>', doc.data());
+      callback(`${doc.id} => ${JSON.stringify(doc.data())}`);
+    });
 
-  await snapshot.forEach((doc) => {
-    console.log(doc.id, '=>', doc.data());
-    callback(`${doc.id} => ${JSON.stringify(doc.data())}`);
-  });
-
-  callback('Fim da busca');
+    callback('Fim da busca');
+  } catch (e) {
+    console.log('--- error', e);
+    callback('Erro na busca');
+  }
 }
 
 module.exports = {
