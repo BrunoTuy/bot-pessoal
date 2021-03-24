@@ -8,6 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 const port = process.env.PORT || 5000;
 const TOKEN = process.env.TOKEN_TELEGRAM;
 const comandos = require( './comandos' );
+const firebase = require('./lib/firebase.js');
 
 const bot = new TelegramBot( TOKEN, { polling: process.env.NODE_ENV !== 'production' } );
 
@@ -72,7 +73,8 @@ bot.on( 'message', ( msg ) => {
       contexto,
       parametros,
       original: msg,
-      callback: ( resp ) => enviar( msg.chat.id, resp )
+      callback: ( resp ) => enviar( msg.chat.id, resp ),
+      lib: { firebase }
     });
 
     banco.setChatVar(msg, 'ultimoComando', comando);
