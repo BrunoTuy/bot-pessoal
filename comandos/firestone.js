@@ -3,7 +3,7 @@ const serviceAccount = {
   type: process.env.FIREBASE_type,
   project_id: process.env.FIREBASE_project_id,
   private_key_id: process.env.FIREBASE_private_key_id,
-  private_key: process.env.FIREBASE_private_key,
+  private_key: `-----BEGIN PRIVATE KEY-----\n${process.env.FIREBASE_private_key.split(',').join('\n')}\n-----END PRIVATE KEY-----`,
   client_email: process.env.FIREBASE_client_email,
   client_id: process.env.FIREBASE_client_id,
   auth_uri: process.env.FIREBASE_auth_uri,
@@ -14,6 +14,8 @@ const serviceAccount = {
 
 const exec = async ({ callback }) => {
   callback('Conectar com o firestone');
+
+  console.log('--- configuracao', serviceAccount);
 
   try {
     admin.initializeApp({
