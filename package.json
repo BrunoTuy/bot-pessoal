@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Bot assistente pessoal",
   "scripts": {
-    "start": "node testHook.js"
+    "start": "node main.js"
   },
   "contributors": [
     {

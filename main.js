@@ -1,24 +1,21 @@
 const express = require('express');
 const TelegramBot = require( 'node-telegram-bot-api' );
 
-// const botOptions = { polling: true };
-
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
-} else {
-  console.log('SET webHook port', process.env.PORT);
-  // botOptions.webHook = { port: process.env.PORT };
 }
 
+const port = process.env.PORT || 5000;
+const TOKEN = process.env.TOKEN_TELEGRAM;
 const comandos = require( './comandos' );
 
-const bot = new TelegramBot( process.env.TOKEN_TELEGRAM );
-const app = express();
+const bot = new TelegramBot( TOKEN, { polling: process.env.NODE_ENV !== 'production' } );
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('SET webHook url', `https://bot-person.herokuapp.com/bot${process.env.TOKEN_TELEGRAM}`);
-  bot.setWebHook(`https://bot-person.herokuapp.com/bot${process.env.TOKEN_TELEGRAM}`);
+  bot.setWebHook(`https://bot-person.herokuapp.com/bot${TOKEN}`);
 }
+
+const app = express();
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
 const banco = require( './lib/banco.js' )();
@@ -82,15 +79,12 @@ bot.on( 'message', ( msg ) => {
   }
 });
 
-app.set('port', (process.env.PORT || 5000));
-app.post(`/bot${process.env.TOKEN_TELEGRAM}`, (req, res) => {
-  console.log('---- mensagem body', req.body);
+app.use(express.json());
+app.post(`/bot${TOKEN}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
 
-app.get('/', (request, response) => {
-  response.send('App is running');
-}).listen(app.get('port'), () => {
-  console.log('App is running, server is listening on port ', app.get('port'));
+app.listen(port, () => {
+  console.log(`Express server is listening on ${port}`);
 });
