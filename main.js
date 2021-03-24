@@ -1,18 +1,18 @@
 const express = require('express');
 const TelegramBot = require( 'node-telegram-bot-api' );
 
-const botOptions = { polling: true };
+// const botOptions = { polling: true };
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 } else {
   console.log('SET webHook port', process.env.PORT);
-  botOptions.webHook = { port: process.env.PORT };
+  // botOptions.webHook = { port: process.env.PORT };
 }
 
 const comandos = require( './comandos' );
 
-const bot = new TelegramBot( process.env.TOKEN_TELEGRAM, botOptions);
+const bot = new TelegramBot( process.env.TOKEN_TELEGRAM );
 const app = express();
 
 if (process.env.NODE_ENV === 'production') {
@@ -84,6 +84,7 @@ bot.on( 'message', ( msg ) => {
 
 app.set('port', (process.env.PORT || 5000));
 app.post(`/bot${process.env.TOKEN_TELEGRAM}`, (req, res) => {
+  console.log('---- mensagem body', req.body);
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
