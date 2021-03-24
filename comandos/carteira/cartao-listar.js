@@ -25,7 +25,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib }) => {
     totais.geral += i.valor;
     totais[i.cartao] = (totais[i.cartao] || 0) + i.valor;
 
-    linhas.push(`${lib.formatData(i.data)} R$ ${lib.formatReal(i.valor)}${i.cartao} ${i.total_parcelas > 1 ? ` ${i.parcela}/${i.total_parcelas}` : ''} - ${i.descritivo}`);
+    linhas.push(`${lib.formatData(i.data)} R$ ${lib.formatReal(i.valor)} ${i.cartao} ${i.total_parcelas > 1 ? ` ${i.parcela}/${i.total_parcelas}` : ''} - ${i.descritivo}`);
   }
 
   linhas.push('');
