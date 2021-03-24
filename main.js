@@ -83,6 +83,11 @@ bot.on( 'message', ( msg ) => {
 });
 
 app.set('port', (process.env.PORT || 5000));
+app.post(`/bot${process.env.TOKEN_TELEGRAM}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
 app.get('/', (request, response) => {
   response.send('App is running');
 }).listen(app.get('port'), () => {
