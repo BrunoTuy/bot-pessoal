@@ -1,7 +1,7 @@
 const contaAdd = require('./conta-add.js');
 const cartaoAdd = require('./cartao-add.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib }) => {
+const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
   if (parametros.length !== 2) {
     callback([
       'Você tem que informar mes e ano limite para processamento',

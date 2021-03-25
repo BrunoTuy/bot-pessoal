@@ -1,20 +1,4 @@
-const exec = async ({ subComando, parametros, callback, banco, lib, parametrosObj }) => {
-  const inserir = ({ data, cartao, descritivo, valor, parcela, parcelas }) => {
-    const competencia = lib.calcularCompetencia({ data, cartao });
-
-    banco.sqlite.run(`
-      INSERT INTO carteira_gastos_cartao (data, cartao, descritivo, valor, parcela, total_parcelas, competencia) 
-      VALUES (${data.getTime()}, '${cartao}', '${descritivo}', ${valor}, ${parcela}, ${parcelas}, ${competencia})
-    `);
-
-    callback([
-      `Cadastrado ${descritivo}`,
-      `${cartao} ${competencia}`,
-      `Em ${data}`,
-      `R$ ${valor/100}`
-    ]);
-  }
-
+const exec = async ({ subComando, parametros, callback, banco, lib, libLocal, parametrosObj }) => {
   if ((!parametros || parametros.length < 5) && !parametrosObj) {
     callback([
       'Exemplo do comando abaixo',
@@ -30,26 +14,47 @@ const exec = async ({ subComando, parametros, callback, banco, lib, parametrosOb
     )) {
       callback(`Tem algo errado nos parametros para incluir compromisso cartão`);
     } else {
-      const data = parametrosObj ? parametrosObj.data : lib.entenderData(parametros.shift());
+      const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
       const cartao = parametrosObj ? parametrosObj.cartao : parametros.shift();
       const parcelas = parametrosObj ? parametrosObj.parcelas : parametros.shift();
       const valor = parametrosObj ? parametrosObj.valor : parametros.shift();
       const descritivo = parametrosObj ? parametrosObj.descritivo : parametros.join(' ');
+      const { db } = lib.firebase;
 
       if (parcelas > 12) {
-        callback(`Tem algo errado nesse número de parcelas. ${parcelas}`);
+        callback(`Tem algo errado nesse número de parcelas. ${parcelas}x`);
       } else {
-        for (let parcela = 1; parcela <= parcelas; parcela++) {
-          inserir({
-            data,
-            cartao,
-            descritivo,
-            valor,
-            parcela,
-            parcelas
-          });
+        const cartoes = db.collection('cartoes');
+        const queryRef = cartoes.where('nome', '==', cartao);
+        const cartoesGet = await queryRef.get();
 
-          data.setMonth(data.getMonth()+1);
+        if (cartoesGet.size !== 1) {
+          callback('Cartão não cadastrado.');
+        } else {
+          const cartaoDoc = cartoesGet.docs[0];
+          const { competencia: competenciaInicial } = cartaoDoc.data();
+
+          if (!competenciaInicial) {
+            callback(`O cartão ${cartao} esta sem competência definida.`);
+          } else {
+            const obj = await db.collection('cartoes').doc(cartaoDoc.id).collection('fatura');
+
+            for (let parcela = 1; parcela <= parcelas; parcela++) {
+              const competencia = libLocal.calcularCompetencia({ competenciaInicial, parcela });
+              const dataCartao = new Date(data);
+              dataCartao.setMonth(data.getMonth()+parcela-1);
+
+              obj.add({
+                data: dataCartao.getTime(),
+                dataTexto: dataCartao,
+                valor,
+                descritivo,
+                parcela,
+                total_parcelas: parcelas,
+                competencia
+              });
+            }
+          }
         }
       }
     }

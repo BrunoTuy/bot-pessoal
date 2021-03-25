@@ -19,12 +19,12 @@ if (process.env.NODE_ENV === 'production') {
 const app = express();
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
-const banco = require( './lib/banco.js' )();
+const banco = require( './lib/banco.js' )(firebase);
 const sqlite = require( './lib/sqlite.js' );
 
 banco.sqlite = sqlite;
 
-bot.on( 'message', ( msg ) => {
+bot.on( 'message', async ( msg ) => {
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
 
   const allowed = (process.env.CHAT_ALLOWED || '').split(',').includes(msg.chat.id.toString());
@@ -37,7 +37,7 @@ bot.on( 'message', ( msg ) => {
     }
   }
 
-  const { ultimoComando, contexto } = banco.getChatVars(msg);
+  const { ultimoComando, contexto } = await banco.getChatData(msg.chat.id);
   const parametros = msg.text ? msg.text.split( ' ' ) : [''];
   const comando = parametros[0].indexOf('/') === 0
     ? parametros.shift().substring( 1 ).split( '@' )[0]
@@ -68,16 +68,18 @@ bot.on( 'message', ( msg ) => {
     cmds[comando].exec({
       bot,
       cmds,
-      banco,
       comando,
       contexto,
       parametros,
       original: msg,
       callback: ( resp ) => enviar( msg.chat.id, resp ),
-      lib: { firebase }
+      lib: { banco, firebase }
     });
 
-    banco.setChatVar(msg, 'ultimoComando', comando);
+    banco.setChatData({
+      chat: msg.chat.id,
+      ultimoComando: comando
+    });
   }
 });
 

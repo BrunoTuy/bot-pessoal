@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const lib = require('./lib/');
+const libLocal = require('./lib/');
 const list = {};
 const comandos = [];
 
 fs
   .readdirSync(__dirname)
-  .filter( ( file )  => (file.indexOf(".") !== 0) && !['index.js', 'lib'].includes(file) )
+  .filter( ( file )  => (file.indexOf(".") !== 0) && !['index.js', 'lib', 'consultas'].includes(file) )
   .forEach( ( file ) => {
     const obj = require(path.join(__dirname, file));
     const name = file.includes('.js') ? file.substring( 0, file.length-3 ) : file;
@@ -24,14 +24,14 @@ fs
 module.exports = {
   restricted: true,
   context: true,
-  exec: async ({ callback, banco, comando, contexto, parametros, original }) => {
+  exec: async ({ callback, banco, comando, contexto, parametros, original, lib }) => {
     const subComando = parametros && parametros.length > 0
       ? parametros.shift().toLowerCase()
       : false;
 
     try {
       if (subComando && list[subComando] && list[subComando].exec) {
-        await list[subComando].exec({ comando, subComando, parametros, callback, banco, lib });
+        await list[subComando].exec({ comando, subComando, parametros, callback, banco, lib, libLocal });
       } else {
         callback(['Controle de gastos TuY','',].concat(comandos).join('\n'));
       }

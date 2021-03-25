@@ -1,23 +1,57 @@
-const exec = async ({ subComando, parametros, callback, banco }) => {
+const consultaRecorrentes = require('./consultas/recorrentes.js');
+
+const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+  const fixo = await consultaRecorrentes.exec({ lib });
+
   if (parametros.length < 2) {
-    callback([
-      'Exemplo do comando abaixo',
-      `${subComando} {id} {dia}`
-    ]);
+    const linhas = [];
+
+    for (const conta of fixo.contas) {
+      conta.lista && conta.lista.length > 0 && linhas.push(`Conta ${conta.nome}`);
+
+      for (const rec of conta.lista) {
+        linhas.push(`${rec.id} D.${rec.dia} R$ ${libLocal.formatReal(rec.valor)} ${rec.descritivo}`)
+      }
+
+      conta.lista && conta.lista.length > 0 && linhas.push('');
+    }
+
+    for (const cartao of fixo.cartoes) {
+      linhas.push(`Cartão ${cartao.nome}`);
+
+      for (const rec of cartao.lista) {
+        linhas.push(`${rec.id} D.${rec.dia} R$ ${libLocal.formatReal(rec.valor)} ${rec.descritivo}`)
+      }
+
+      linhas.push('');
+    }
+
+    linhas.push('Exemplo do comando abaixo');
+    linhas.push(`${subComando} {id} {dia}`);
+
+    callback(linhas);
   } else {
     const id = parametros.shift();
     const dia = parametros.shift();
-    const list = await banco.sqlite.all(`SELECT data FROM carteira_gastos_fixo WHERE id = ${id}`);
+    let contaId = null;
+    let collection = null;
 
-    if (list.length !== 1) {
-      callback('Registro não encontrado');
+    for (const rec of fixo.geral) {
+      if (rec.recId === id) {
+        contaId = rec.paiId;
+        collection = rec.tipo;
+        break;
+      }
+    }
+
+    if (contaId) {
+      const docRef = lib.firebase.db.collection(collection).doc(contaId).collection('recorrente').doc(id);
+
+      docRef.update({ dia });
+
+      callback('Compromisso atualizado.');
     } else {
-      const data = new Date(list[0].data);
-      data.setDate(dia);
-
-      banco.sqlite.run(`UPDATE carteira_gastos_fixo set data = ${data.getTime()} WHERE id = ${id}`);
-
-      callback('Registro atualizado');
+      callback('Compromisso não encontrado.');
     }
   }
 }
