@@ -1,4 +1,4 @@
-const exec = ({ subComando, parametros, callback, banco, lib, parametrosObj }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal, parametrosObj }) => {
   if ((!parametros || parametros.length < 4) && !parametrosObj) {
     callback([
       'Exemplo do comando abaixo',
@@ -14,40 +14,55 @@ const exec = ({ subComando, parametros, callback, banco, lib, parametrosObj }) =
       callback(`Tem algo errado nos parametros para incluir compromisso cartão`);
     } else {
       const dataAgora = new Date();
-      const data = parametrosObj ? parametrosObj.data : lib.entenderData(parametros.shift());
+      const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
       const conta = parametrosObj ? parametrosObj.conta : parametros.shift();
       const strValor = (parametrosObj ? parametrosObj.valor : parametros.shift()).toString();
       const descritivo = parametrosObj ? parametrosObj.descritivo : parametros.join(' ');
-      const fixoId = parametrosObj ? parametrosObj.fixoId : null;
+      const recorrente = parametrosObj ? parametrosObj.recorrente : null;
+      const { db } = lib.firebase;
 
-      const valor = strValor.substring(strValor.length-1) === 'c'
-        ? strValor.substring(0, strValor.length-1)
-        : strValor*-1;
+      const queryRef = db.collection('contas').where('banco', '==', conta);
+      const contasGet = await queryRef.get();
 
-      const status = parametrosObj && parametrosObj.status
-        ? parametrosObj.status
-        : (dataAgora.getFullYear() > data.getFullYear()
-          || (dataAgora.getFullYear() === data.getFullYear() && dataAgora.getMonth() > data.getMonth())
-          || (dataAgora.getFullYear() === data.getFullYear() && dataAgora.getMonth() === data.getMonth() && dataAgora.getDate() >= data.getDate()))
-          ? 'feito'
-          : 'previsto';
+      if (contasGet.size !== 1) {
+        callback('Conta não cadastrada.');
+      } else {
+        const contaDoc = contasGet.docs[0];
+        const valor = strValor.substring(strValor.length-1) === 'c'
+          ? strValor.substring(0, strValor.length-1)
+          : strValor*-1;
 
-      banco.sqlite.run(`
-        INSERT INTO carteira_gastos_conta (data, conta, descritivo, valor, status, fixo_id)
-        VALUES (${data.getTime()}, '${conta}', '${descritivo}', ${valor}, '${status}', ${fixoId})
-      `);
+        const status = parametrosObj && parametrosObj.status
+          ? parametrosObj.status
+          : (dataAgora.getFullYear() > data.getFullYear()
+            || (dataAgora.getFullYear() === data.getFullYear() && dataAgora.getMonth() > data.getMonth())
+            || (dataAgora.getFullYear() === data.getFullYear() && dataAgora.getMonth() === data.getMonth() && dataAgora.getDate() >= data.getDate()))
+            ? 'feito'
+            : 'previsto';
 
-      callback([
-        `Cadastrado ${descritivo}`,
-        `${conta}`,
-        `Em ${data}`,
-        `R$ ${valor/100}`
-      ]);
+        const obj = await db.collection('contas').doc(contaDoc.id).collection('extrato');
+
+        obj && obj.add({
+          data: data.getTime(),
+          dataTexto: data,
+          valor,
+          descritivo,
+          status,
+          recorrente
+        });
+
+        callback([
+          `Cadastrado ${descritivo}`,
+          `${conta}`,
+          `Em ${data}`,
+          `R$ ${valor/100}`
+        ]);
+      }
     }
   }
-}
+};
 
 module.exports = {
   alias: ['cca', 'ccadd'],
   exec,
-}
+};

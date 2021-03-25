@@ -59,9 +59,9 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal, pa
       }
     }
   }
-}
+};
 
 module.exports = {
   alias: ['cda', 'cdadd'],
   exec,
-}
+};
