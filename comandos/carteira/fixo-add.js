@@ -26,6 +26,7 @@ const exec = ({ subComando, parametros, callback, banco }) => {
 }
 
 module.exports = {
+  hidden: true,
   alias: ['fa', 'fadd'],
   exec,
 }
