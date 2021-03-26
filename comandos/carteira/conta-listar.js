@@ -1,21 +1,20 @@
-const exec = async ({ parametros, callback, banco, lib }) => {
+const exec = async ({ parametros, callback, banco, lib, libLocal }) => {
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros > 202101 ? parametros.shift() : null;
   const conta = parametros.shift();
   const linhas = [];
   const totais = {
     feito: 0,
     previsto: 0,
-    geral: 0
   };
 
-  const data = new Date();
+  const dataMin = new Date();
   const dataMax = new Date();
 
-  data.setDate(1);
-  data.setHours(0);
-  data.setMinutes(0);
-  data.setSeconds(0);
-  data.setMilliseconds(0);
+  dataMin.setDate(1);
+  dataMin.setHours(0);
+  dataMin.setMinutes(0);
+  dataMin.setSeconds(0);
+  dataMin.setMilliseconds(0);
 
   dataMax.setHours(23);
   dataMax.setMinutes(59);
@@ -23,45 +22,60 @@ const exec = async ({ parametros, callback, banco, lib }) => {
   dataMax.setMilliseconds(999);
 
   if (anoMes) {
-    data.setFullYear(anoMes.toString().substring(0, 4))
-    data.setMonth(anoMes.toString().substring(4)-1);
+    dataMin.setFullYear(anoMes.toString().substring(0, 4))
+    dataMin.setMonth(anoMes.toString().substring(4)-1);
 
     dataMax.setFullYear(anoMes.toString().substring(0, 4))
     dataMax.setMonth(anoMes.toString().substring(4), 1);
   } else {
-    dataMax.setMonth(data.getMonth()+1, 1);
+    dataMax.setMonth(dataMin.getMonth()+1, 1);
   }
 
   dataMax.setDate(dataMax.getDate()-1);
 
-  const list = await banco.sqlite.all(`
-    SELECT *
-    FROM carteira_gastos_conta
-    WHERE data between ${data.getTime()} AND ${dataMax.getTime()}
-    ${conta ? ` AND conta = '${conta}'` : ''}
-    ORDER BY data ASC
-  `);
+  const { db } = lib.firebase;
 
-  for (const i of list) {
-    totais.geral += i.valor;
-    totais.feito += i.status === 'feito' ? i.valor : 0;
-    totais.previsto += i.status.includes('previsto') ? i.valor : 0;
-    const status = i.status === 'previsto fixo'
-      ? 'PF'
-      : i.status === 'feito'
-        ? 'OK'
-        : i.status === 'previsto'
-          ? 'PC'
-          : 'ND';
+  const contas = await db.collection('contas').get();
+  for (const conta of contas.docs) {
+    let feito = 0;
+    let previsto = 0;
 
-    linhas.push(`${lib.formatData(i.data)} ${status} R$ ${lib.formatReal(i.valor)} - ${i.conta} - ${i.descritivo}`);
+    const extrato = await db.collection('contas').doc(conta.id).collection('extrato')
+      .where('data', '>=', dataMin.getTime())
+      .where('data', '<=', dataMax.getTime())
+      .orderBy('data')
+      .get();
+    for (const i of extrato.docs) {
+      const { data, status, valor, descritivo } = i.data();
+
+      feito += status === 'feito' ? valor : 0;
+      previsto += status.includes('previsto') ? valor : 0;
+
+      const formatStatus = status === 'previsto fixo'
+        ? 'PF'
+        : status === 'feito'
+          ? 'OK'
+          : status === 'previsto'
+            ? 'PC'
+            : 'ND';
+
+      linhas.push(`${libLocal.formatData(data)} ${formatStatus} R$ ${libLocal.formatReal(valor)} - ${descritivo}`);
+    }
+
+    totais.feito += feito;
+    totais.previsto += previsto;
+
+    extrato.size > 0 && linhas.push(`-- Conta ${conta.data().banco}`)
+    extrato.size > 0 && linhas.push(`== Previsto R$ ${libLocal.formatReal(previsto)}`);
+    extrato.size > 0 && linhas.push(`== Feito R$ ${libLocal.formatReal(feito)}`);
+    extrato.size > 0 && linhas.push(`== Total R$ ${libLocal.formatReal(previsto+feito)}`);
+    extrato.size > 0 && linhas.push('');
   }
 
-  linhas.push('');
-  linhas.push('------ RESUMO ------');
-  linhas.push(`Executado R$ ${lib.formatReal(totais.feito)}`);
-  linhas.push(`Previsto R$ ${lib.formatReal(totais.previsto)}`);
-  linhas.push(`Total R$ ${lib.formatReal(totais.geral)}`);
+  linhas.push('------ Geral ------');
+  linhas.push(`== Executado R$ ${libLocal.formatReal(totais.feito)}`);
+  linhas.push(`== Previsto R$ ${libLocal.formatReal(totais.previsto)}`);
+  linhas.push(`== Total R$ ${libLocal.formatReal(totais.feito+totais.previsto)}`);
 
   callback(linhas);
 }
