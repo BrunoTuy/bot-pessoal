@@ -82,6 +82,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib }) => {
 }
 
 module.exports = {
+  hidden: true,
   alias: ['caj', 'ccaj'],
   exec,
 }
