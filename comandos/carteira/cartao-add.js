@@ -1,4 +1,5 @@
 const inserir = require('./dto/inserirCartaoFatura.js');
+const faturas = require('./cartao-gerar-faturas.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (!parametros || parametros.length < 5) {
@@ -47,6 +48,12 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
                 parcelas,
                 competencia
               }
+            });
+
+            faturas.exec({
+              lib,
+              libLocal,
+              parametros: [competencia, cartao]
             });
           }
         }

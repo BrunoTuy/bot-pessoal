@@ -1,5 +1,7 @@
 const exec = async ({ parametros, callback, lib, libLocal }) => {
-  const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros > 202101 ? parametros.shift() : null;
+  const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
+    ? parametros.shift()
+    : null;
   const linhas = [];
   const totais = {
     feito: 0,

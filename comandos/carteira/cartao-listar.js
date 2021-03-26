@@ -1,42 +1,32 @@
+const cartaoExtrato = require('./dto/cartaoExtrato.js');
+
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const { db } = lib.firebase;
   const data = new Date();
-  const competencia = parametros.length > 0 && parametros[0].length === 6 && parametros > 202101
+  const competencia = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
     : data.getFullYear()*100+(data.getMonth() > 10
       ? 101
       : data.getMonth()+2);
   const linhas = [];
-  let totalGeral = 0;
-
-  const cartoes = await db.collection('cartoes').get();
+  let total = 0;
 
   linhas.push(`------ ${competencia} ------`);
 
-  for (const cartao of cartoes.docs) {
-    let total = 0;
+  const cartoes = await cartaoExtrato.exec({ lib, competencia });
 
-    const fatura = await db.collection('cartoes').doc(cartao.id).collection('fatura')
-      .where('competencia', '==', competencia)
-      .orderBy('data')
-      .get();
-    for (const i of fatura.docs) {
-      const { data, valor, descritivo, parcela, total_parcelas: parcelas } = i.data();
-
-      linhas.push(`${libLocal.formatData(data)} R$ ${libLocal.formatReal(valor)} ${parcelas > 1 ? ` ${parcela}/${parcelas}` : ''} - ${descritivo}`);
-
-      total += parseInt(valor);
+  for (const cartao of cartoes) {
+    for (const i of cartao.fatura) {
+      linhas.push(`${libLocal.formatData(i.data)} R$ ${libLocal.formatReal(i.valor)} ${i.total_parcelas > 1 ? ` ${i.parcela}/${i.total_parcelas}` : ''} - ${i.descritivo}`);
     }
 
-
-    totalGeral += total;
-
-    fatura.size > 0 && linhas.push(`== ${cartao.data().nome} R$ ${libLocal.formatReal(total)}`);
-    fatura.size > 0 && linhas.push('');
+    total += cartao.total;
+    cartao.fatura.length > 0 && linhas.push(`== ${cartao.nome} R$ ${libLocal.formatReal(cartao.total)}`);
+    cartao.fatura.length > 0 && linhas.push('');
   }
 
   linhas.push('------ Geral ------');
-  linhas.push(`== Total R$ ${libLocal.formatReal(totalGeral)}`);
+  linhas.push(`== Total R$ ${libLocal.formatReal(total)}`);
 
   callback(linhas);
 }

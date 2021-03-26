@@ -1,6 +1,7 @@
 const consultaRecorrentes = require('./dto/recorrentes.js');
 const contaAdd = require('./conta-add.js');
 const cartaoAdd = require('./dto/inserirCartaoFatura.js');
+const faturas = require('./cartao-gerar-faturas.js');
 
 const correrLista = async ({ lista, collection1, collection2, insert, ano, mes, db }) => {
   let contador = 0;
@@ -138,6 +139,12 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
             recorrente,
             competencia
           }
+        });
+
+        faturas.exec({
+          lib,
+          libLocal,
+          parametros: [competencia, nome]
         });
       }
     });
