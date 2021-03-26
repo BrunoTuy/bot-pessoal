@@ -1,11 +1,11 @@
 const cartoes = {
-  inter: '1Tp9UWNkVGIBCxI06CC4',
-  nubank: 'nS5oXwcv59kdNet8dYDT'
+  inter: '3quiBXeXI1AJk50zzVBH',
+  nubank: '8zslnbqQDaXglkCJPUj2'
 };
 const contas = {
-  bb: '78YB01OpNh9sUDicqTqD',
-  inter: 'V0R4JNjmbmW1AUxFrs3q',
-  nubank: 'WxqSTzDGWNj81FhX0RK9'
+  bb: 'buXsBdZ98yN81IpxuMKz',
+  inter: '6orVYwtk0geS30zesJed',
+  nubank: 'oPqOFGpqM1Etdok7e2kC'
 };
 
 const fixo = async ({ lib, callback }) => {
@@ -98,6 +98,7 @@ const exec = async ({ comando, callback, lib, original }) => {
 }
 
 module.exports = {
+  ocultar: true,
   restricted: true,
   exec
 };
