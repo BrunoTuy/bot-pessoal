@@ -25,8 +25,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
       linhas.push(`${libLocal.formatData(data)} R$ ${libLocal.formatReal(valor)} ${parcelas > 1 ? ` ${parcela}/${parcelas}` : ''} - ${descritivo}`);
 
-      total += valor;
+      total += parseInt(valor);
     }
+
 
     totalGeral += total;
 

@@ -2,12 +2,12 @@ const exec = async ({ lib, params, callback }) => {
   const { cartao, data, valor, descritivo, parcela, parcelas, competencia, recorrente } = params;
   const obj = await lib.firebase.db.collection('cartoes').doc(cartao).collection('fatura');
   obj.add({
-    data: data.getTime(),
-    dataTexto: data,
-    valor,
     descritivo,
     competencia,
-    parcela: parcela || 1,
+    dataTexto: data,
+    data: data.getTime(),
+    valor: parseInt(valor),
+    parcela: parseInt(parcela) || 1,
     total_parcelas: parseInt(parcelas) || 1,
     recorrente: recorrente || null
   });
