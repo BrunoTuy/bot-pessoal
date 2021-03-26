@@ -1,43 +1,25 @@
-const exec = async ({ subComando, parametros, callback, banco, lib }) => {
-  if (parametros.length === 3) {
-    const id = parametros.shift();
-    const data = parametros.shift().toString();
+const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+  const { db } = lib.firebase;
+
+  if (parametros.length === 4) {
+    const contaId = parametros.shift();
+    const extratoId = parametros.shift();
+    const data = libLocal.entenderData(parametros.shift());
     const strValor = parametros.shift().toString();
 
-    const list = await banco.sqlite.all(`
-      SELECT *
-      FROM carteira_gastos_conta
-      WHERE id = ${id} AND
-        status like 'previsto%'
-      ORDER BY data ASC
-    `);
+    const valor = strValor.substring(strValor.length-1) === 'c'
+      ? strValor.substring(0, strValor.length-1)
+      : strValor*-1;
 
-    if (list.length !== 1) {
-      callback('Registro não encontrado.');
-    } else {
-      const dataReg = new Date(list[0].data);
+    const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(extratoId);
+    docRef.update({
+      valor,
+      status: 'feito',
+      dataTexto: data,
+      data: data.getTime()
+    });
 
-      if (data.length < 3) {
-        dataReg.setDate(data);
-      } else {
-        dataReg.setFullYear(data.substring(0, 4));
-        dataReg.setMonth(data.substring(4, 6), data.substring(6, 8));
-      }
-
-      const valor = strValor.substring(strValor.length-1) === 'c'
-        ? strValor.substring(0, strValor.length-1)
-        : strValor*-1;
-
-      banco.sqlite.run(`
-        UPDATE carteira_gastos_conta
-          SET data = ${dataReg.getTime()},
-              valor = ${valor},
-              status = 'feito'
-        WHERE id = ${id}
-      `);
-
-      callback('Registro atualizado')
-    }
+    callback('Registro atualizado')
   } else {
     const linhas = [];
     const data = new Date();
@@ -47,20 +29,29 @@ const exec = async ({ subComando, parametros, callback, banco, lib }) => {
     data.setSeconds(59);
     data.setMilliseconds(999);
 
-    const list = await banco.sqlite.all(`
-      SELECT *
-      FROM carteira_gastos_conta
-      WHERE data < ${data.getTime()} AND
-        status like 'previsto%'
-      ORDER BY data ASC
-    `);
+    const contas = await db.collection('contas').get();
+    for (const conta of contas.docs) {
+      const extrato = await db.collection('contas').doc(conta.id).collection('extrato')
+        .where('data', '<=', data.getTime())
+        .where('status', 'in', ['previsto', 'previsto fixo'])
+        .orderBy('data')
+        .get();
 
-    for (const i of list) {
-      linhas.push(`::${i.id}:: ${lib.formatData(i.data)} R$ ${lib.formatReal(i.valor)} - ${i.conta} - ${i.descritivo}`);
+      extrato.size > 0 && linhas.push(`-- ${conta.data().banco} ${conta.id}`);
+
+      for (const i of extrato.docs) {
+        const { data, status, valor, descritivo } = i.data();
+        const formatStatus = status === 'previsto fixo'
+          ? 'PF'
+          : 'PC'
+
+        linhas.push(`${i.id} ${libLocal.formatData(data)} ${formatStatus} R$${libLocal.formatReal(valor)} ${descritivo}`);
+      }
+
+      extrato.size > 0 && linhas.push('');
     }
 
-    linhas.push('');
-    linhas.push(`${subComando} {id} {dia|data} {valor}`);
+    linhas.push(`${subComando} {conta id} {movimento id} {dia|data} {valor}`);
 
     callback(linhas);
   }
