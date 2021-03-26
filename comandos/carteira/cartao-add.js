@@ -1,4 +1,4 @@
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal, parametrosObj }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal, parametrosObj }) => {
   if ((!parametros || parametros.length < 5) && !parametrosObj) {
     callback([
       'Exemplo do comando abaixo',
@@ -19,6 +19,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal, pa
       const parcelas = parametrosObj ? parametrosObj.parcelas : parametros.shift();
       const valor = parametrosObj ? parametrosObj.valor : parametros.shift();
       const descritivo = parametrosObj ? parametrosObj.descritivo : parametros.join(' ');
+      const recorrente = parametrosObj ? parametrosObj.recorrente : null;
       const { db } = lib.firebase;
 
       if (parcelas > 12) {
@@ -51,7 +52,8 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal, pa
                 descritivo,
                 parcela,
                 total_parcelas: parcelas,
-                competencia
+                competencia,
+                recorrente
               });
             }
           }

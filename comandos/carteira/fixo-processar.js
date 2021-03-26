@@ -1,111 +1,64 @@
+const consultaRecorrentes = require('./consultas/recorrentes.js');
 const contaAdd = require('./conta-add.js');
 const cartaoAdd = require('./cartao-add.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
-  if (parametros.length !== 2) {
-    callback([
-      'Você tem que informar mes e ano limite para processamento',
-      `${subComando} {ano} {mes}`
-    ]);
-  } else {
-    let contador = 0;
-    const data = new Date();
-    const ano = parametros.shift();
-    const mes = parametros.shift();
-    const list = await banco.sqlite.all('SELECT * FROM carteira_gastos_fixo WHERE ativo = 1');
+const correrLista = async ({ lista, collection1, collection2, insert, ano, mes, db }) => {
+  let contador = 0;
+  const data = new Date();
 
-    for (const i of list) {
+  for (const item of lista) {
+    for (const rec of item.lista) {
+      const { dia, valor, descritivo } = rec;
       const cadastro = {
         ano: data.getFullYear(),
         mes: data.getMonth()+1
       };
 
       while (cadastro.ano < ano || (cadastro.ano == ano && cadastro.mes <= mes)) {
-        const dataA = new Date(i.data);
+        const dataBuscar = new Date();
 
-        dataA.setFullYear(cadastro.ano)
-        dataA.setMonth(cadastro.mes-1);
-        dataA.setHours(12);
-        dataA.setMinutes(0);
-        dataA.setSeconds(0);
-        dataA.setMilliseconds(0);
+        dataBuscar.setFullYear(cadastro.ano)
+        dataBuscar.setMonth(cadastro.mes-1, 1);
+        dataBuscar.setHours(0);
+        dataBuscar.setMinutes(0);
+        dataBuscar.setSeconds(0);
+        dataBuscar.setMilliseconds(0);
 
-        const competencia = cadastro.ano*100+cadastro.mes+1;
+        const dataMin = dataBuscar.getTime();
 
-        if (i.cartao) {
-          const verificar = await banco.sqlite.all(`
-            SELECT *
-            FROM carteira_gastos_cartao
-            WHERE cartao = '${i.cartao}' AND
-              descritivo = '${i.descritivo}' AND
-              parcela = 1 AND
-              total_parcelas = 1 AND
-              competencia = ${competencia} AND
-              valor = ${i.valor}
-          `);
+        dataBuscar.setMonth(dataBuscar.getMonth()+1, 1);
+        dataBuscar.setDate(dataBuscar.getDate()-1);
+        dataBuscar.setHours(23);
+        dataBuscar.setMinutes(59);
+        dataBuscar.setSeconds(59);
 
-          if (verificar.length < 1) {
-            cartaoAdd.exec({
-              lib,
-              banco,
-              callback,
-              subComando,
-              parametrosObj: {
-                data: dataA,
-                parcelas: 1,
-                valor: i.valor,
-                cartao: i.cartao,
-                descritivo: i.descritivo,
-              }
-            });
+        const dataMax = dataBuscar.getTime();
 
-            contador++;
-          }
-        } else if (i.conta) {
-          const dataBuscar = new Date();
+        const queryRef = db.collection(collection1).doc(item.id).collection(collection2)
+          .where('recorrente', '==', rec)
+          .where('data', '>=', dataMin)
+          .where('data', '<=', dataMax);
+        const verificarGet = await queryRef.get();
 
-          dataBuscar.setFullYear(cadastro.ano)
-          dataBuscar.setMonth(cadastro.mes-1, 1);
-          dataBuscar.setHours(0);
-          dataBuscar.setMinutes(0);
-          dataBuscar.setSeconds(0);
-          dataBuscar.setMilliseconds(0);
+        if (verificarGet.size < 1) {
+          const dataA = new Date();
 
-          const dataMin = dataBuscar.getTime();
+          dataA.setFullYear(cadastro.ano)
+          dataA.setMonth(cadastro.mes-1, dia);
+          dataA.setHours(12);
+          dataA.setMinutes(0);
+          dataA.setSeconds(0);
+          dataA.setMilliseconds(0);
 
-          dataBuscar.setMonth(dataBuscar.getMonth()+1, 1);
-          dataBuscar.setDate(dataBuscar.getDate()-1);
-          dataBuscar.setHours(23);
-          dataBuscar.setMinutes(59);
-          dataBuscar.setSeconds(59);
+          insert({
+            valor,
+            descritivo,
+            data: dataA,
+            recorrente: rec,
+            nome: item.nome,
+          });
 
-          const dataMax = dataBuscar.getTime();
-
-          const verificar = await banco.sqlite.all(`
-            SELECT *
-            FROM carteira_gastos_conta
-            WHERE fixo_id = '${i.id}' AND
-              data between ${dataMin} AND ${dataMax}
-          `);
-
-          if (verificar.length < 1) {
-            contaAdd.exec({
-              lib,
-              banco,
-              callback,
-              subComando,
-              parametrosObj: {
-                data: dataA,
-                fixoId: i.id,
-                conta: i.conta,
-                valor: i.valor,
-                descritivo: i.descritivo,
-                status: 'previsto fixo'
-              }
-            })
-
-            contador++;
-          }
+          contador++;
         }
 
         cadastro.mes++;
@@ -116,6 +69,71 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
         }
       }
     }
+  }
+
+  return contador;
+};
+
+const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+  if (parametros.length !== 2) {
+    callback([
+      'Você tem que informar mes e ano limite para processamento',
+      `${subComando} {ano} {mes}`
+    ]);
+  } else {
+    let contador = 0;
+    const ano = parametros.shift();
+    const mes = parametros.shift();
+    const fixo = await consultaRecorrentes.exec({ lib });
+    const { db } = lib.firebase;
+
+    contador += await correrLista({ 
+      db,
+      ano,
+      mes,
+      lista: fixo.contas,
+      collection1: 'contas',
+      collection2: 'extrato',
+      insert: ({ data, recorrente, nome, valor, descritivo }) => {
+        contaAdd.exec({
+          lib,
+          libLocal,
+          callback,
+          parametrosObj: {
+            data,
+            valor,
+            descritivo,
+            recorrente,
+            conta: nome,
+            status: 'previsto fixo'
+          }
+        });
+      }
+    });
+
+    contador += await correrLista({ 
+      db,
+      ano,
+      mes,
+      lista: fixo.cartoes,
+      collection1: 'cartoes',
+      collection2: 'fatura',
+      insert: ({ data, recorrente, nome, valor, descritivo }) => {
+        cartaoAdd.exec({
+          lib,
+          libLocal,
+          callback,
+          parametrosObj: {
+            valor,
+            data,
+            descritivo,
+            recorrente,
+            parcelas: 1,
+            cartao: nome
+          }
+        });
+      }
+    });
 
     callback(`${contador} registros inseridos.`);
   }

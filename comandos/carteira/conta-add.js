@@ -11,7 +11,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       !parametrosObj.valor ||
       !parametrosObj.descritivo
     )) {
-      callback(`Tem algo errado nos parametros para incluir compromisso cartão`);
+      callback(`Tem algo errado nos parametros para incluir compromisso na conta`);
     } else {
       const dataAgora = new Date();
       const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
