@@ -1,4 +1,4 @@
-const consultaRecorrentes = require('./consultas/recorrentes.js');
+const consultaRecorrentes = require('./dto/recorrentes.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const fixo = await consultaRecorrentes.exec({ lib });

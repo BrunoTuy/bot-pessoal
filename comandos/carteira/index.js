@@ -6,7 +6,7 @@ const comandos = [];
 
 fs
   .readdirSync(__dirname)
-  .filter( ( file )  => (file.indexOf(".") !== 0) && !['index.js', 'lib', 'consultas'].includes(file) )
+  .filter( ( file )  => (file.indexOf(".") !== 0) && !['index.js', 'lib', 'dto'].includes(file) )
   .forEach( ( file ) => {
     const obj = require(path.join(__dirname, file));
     const name = file.includes('.js') ? file.substring( 0, file.length-3 ) : file;

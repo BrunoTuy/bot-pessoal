@@ -1,4 +1,4 @@
-const consultaRecorrentes = require('./consultas/recorrentes.js');
+const consultaRecorrentes = require('./dto/recorrentes.js');
 
 const exec = async ({ parametros, callback, banco, lib, libLocal }) => {
   const tipo = parametros.shift();

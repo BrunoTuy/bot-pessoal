@@ -26,7 +26,7 @@ const exec = async ({ lib }) => {
 
   for (const cartao of cartoes.docs) {
     const lista = [];
-    const { nome } = cartao.data();
+    const { nome, competencia } = cartao.data();
     const recorrentes = await db.collection('cartoes').doc(cartao.id).collection('recorrente').orderBy('dia').get();
   
     for (const rec of recorrentes.docs) {
@@ -34,7 +34,7 @@ const exec = async ({ lib }) => {
       retorno.geral.push({...rec.data(), recId: rec.id, paiId: cartao.id, tipo: 'cartoes'});
     }
 
-    retorno.cartoes.push({id: cartao.id, nome, lista});
+    retorno.cartoes.push({id: cartao.id, nome, competencia, lista});
   }
 
   return retorno;

@@ -40,7 +40,7 @@ bot.on( 'message', async ( msg ) => {
   const { ultimoComando, contexto } = await banco.getChatData(msg.chat.id);
   const parametros = msg.text ? msg.text.split( ' ' ) : [''];
   const comando = parametros[0].indexOf('/') === 0
-    ? parametros.shift().substring( 1 ).split( '@' )[0]
+    ? parametros.shift().substring( 1 ).split( '@' )[0].toLowerCase()
     : ultimoComando && cmds[ultimoComando] && cmds[ultimoComando].context
       ? ultimoComando
       : false;

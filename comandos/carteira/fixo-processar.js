@@ -1,6 +1,6 @@
-const consultaRecorrentes = require('./consultas/recorrentes.js');
+const consultaRecorrentes = require('./dto/recorrentes.js');
 const contaAdd = require('./conta-add.js');
-const cartaoAdd = require('./cartao-add.js');
+const cartaoAdd = require('./dto/inserirCartaoFatura.js');
 
 const correrLista = async ({ lista, collection1, collection2, insert, ano, mes, db }) => {
   let contador = 0;
@@ -8,6 +8,7 @@ const correrLista = async ({ lista, collection1, collection2, insert, ano, mes, 
 
   for (const item of lista) {
     for (const rec of item.lista) {
+      let idx = 0;
       const { dia, valor, descritivo } = rec;
       const cadastro = {
         ano: data.getFullYear(),
@@ -16,6 +17,8 @@ const correrLista = async ({ lista, collection1, collection2, insert, ano, mes, 
 
       while (cadastro.ano < ano || (cadastro.ano == ano && cadastro.mes <= mes)) {
         const dataBuscar = new Date();
+
+        idx++;
 
         dataBuscar.setFullYear(cadastro.ano)
         dataBuscar.setMonth(cadastro.mes-1, 1);
@@ -54,8 +57,11 @@ const correrLista = async ({ lista, collection1, collection2, insert, ano, mes, 
             valor,
             descritivo,
             data: dataA,
+            contador: idx,
             recorrente: rec,
             nome: item.nome,
+            itemId: item.id,
+            competencia: item.competencia
           });
 
           contador++;
@@ -118,18 +124,19 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
       lista: fixo.cartoes,
       collection1: 'cartoes',
       collection2: 'fatura',
-      insert: ({ data, recorrente, nome, valor, descritivo }) => {
-        cartaoAdd.exec({
+      insert: ({ data, recorrente, nome, valor, descritivo, itemId, competencia: competenciaInicial, contador }) => {
+        const competencia = libLocal.calcularCompetencia({ competenciaInicial, parcela: contador });
+
+        cartaoAdd({
           lib,
-          libLocal,
           callback,
-          parametrosObj: {
-            valor,
+          params: {
+            cartao: itemId,
             data,
+            valor,
             descritivo,
             recorrente,
-            parcelas: 1,
-            cartao: nome
+            competencia
           }
         });
       }
