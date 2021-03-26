@@ -23,9 +23,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const digitado = parametros.length > 0;
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
-    : data.getFullYear()*100+(data.getMonth() > 10
-      ? 101
-      : data.getMonth()+2);
+    : data.getFullYear()*100+(data.getMonth()+1);
   const contas = await extrato.exec({ anoMes, lib });
 
   linhas = linhas.concat(mostrar(contas.lista, anoMes));
