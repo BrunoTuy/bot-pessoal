@@ -47,8 +47,8 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     for (const i of extrato.docs) {
       const { data, status, valor, descritivo } = i.data();
 
-      feito += status === 'feito' ? valor : 0;
-      previsto += status.includes('previsto') ? valor : 0;
+      feito += status === 'feito' ? parseInt(valor) : 0;
+      previsto += status.includes('previsto') ? parseInt(valor) : 0;
 
       const formatStatus = status === 'previsto fixo'
         ? 'PF'

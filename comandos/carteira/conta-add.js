@@ -45,7 +45,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
         obj && obj.add({
           data: data.getTime(),
           dataTexto: data,
-          valor,
+          valor: parseInt(valor),
           descritivo,
           status,
           recorrente
