@@ -1,28 +1,22 @@
 const cartaoAdd = require('./cartao-add.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (!parametros || parametros.length < 3) {
     callback([
       'Exemplo do comando abaixo',
       `${subComando} {data} {valor em centavos} {descritivo}`,
     ]);
   } else {
-    const data = lib.entenderData(parametros.shift());
+    const data = parametros.shift();
     const valor = parametros.shift();
     const descritivo = parametros.join(' ');
 
     cartaoAdd.exec({
       lib,
-      banco,
       callback,
+      libLocal,
       subComando,
-      parametrosObj: {
-        data,
-        valor,
-        parcelas: 1,
-        cartao: 'inter',
-        descritivo: descritivo
-      }
+      parametros: [data, 'inter', 1, valor, descritivo]
     });
   }
 }
