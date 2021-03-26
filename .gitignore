@@ -60,3 +60,5 @@ sherok.json
 config.json
 .env
 *.sqlite
+
+*firebase-adminsdk*.json

@@ -10,6 +10,7 @@ const exec = ({ bot, callback, original }) => {
 }
 
 module.exports = {
+  ocultar: true,
   restricted: true,
   exec
 };
