@@ -33,7 +33,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
       conta.previsto !== 0 && linhas.push(`<pre>${conta.banco.toUpperCase()} - Previsto R$ ${libLocal.formatReal(conta.previsto)}</pre>`);
     }
 
-    linhas.push(`<b>${proximo} Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}</b>`);
+    linhas.push(`<b>${proximo} Total R$ ${libLocal.formatReal(proximasContas.totais.feito+proximasContas.totais.previsto)}</b>`);
   }
 
   callback(linhas);  
