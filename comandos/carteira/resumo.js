@@ -2,22 +2,6 @@ const extrato = require('./dto/extrato.js');
 
 
 const exec = async ({ parametros, callback, lib, libLocal }) => {
-  const mostrar = (contas, anoMes) => {
-    const linhas = [];
-
-    for (const conta of contas.lista) {
-      conta.previsto !== 0 && linhas.push(`<pre>Previsto R$ ${libLocal.formatReal(conta.previsto)}</pre>`);
-      conta.feito !== 0 && linhas.push(`<pre>Executado R$ ${libLocal.formatReal(conta.feito)}</pre>`);
-      (conta.previsto !== 0 || conta.feito !== 0) && linhas.push(`<pre>${conta.banco.toUpperCase()} - Saldo R$ ${libLocal.formatReal(conta.feito+conta.previsto)}</pre>`);
-      (conta.previsto !== 0 || conta.feito !== 0) && linhas.push('');
-    }
-
-    linhas.push(`<pre>Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}</pre>`);
-    linhas.push(`<pre>Executado R$ ${libLocal.formatReal(contas.totais.feito)}</pre>`);
-    linhas.push(`<b>${anoMes} Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}</b>`);
-
-    return linhas;
-  };
   let linhas = [];
   const data = new Date();
   const digitado = parametros.length > 0;
@@ -26,7 +10,16 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     : data.getFullYear()*100+(data.getMonth()+1);
   const contas = await extrato.exec({ anoMes, lib });
 
-  linhas = linhas.concat(mostrar(contas, anoMes));
+  for (const conta of contas.lista) {
+    conta.previsto !== 0 && linhas.push(`<pre>Previsto R$ ${libLocal.formatReal(conta.previsto)}</pre>`);
+    conta.feito !== 0 && linhas.push(`<pre>Executado R$ ${libLocal.formatReal(conta.feito)}</pre>`);
+    (conta.previsto !== 0 || conta.feito !== 0) && linhas.push(`<pre>${conta.banco.toUpperCase()} - Saldo R$ ${libLocal.formatReal(conta.feito+conta.previsto)}</pre>`);
+    (conta.previsto !== 0 || conta.feito !== 0) && linhas.push('');
+  }
+
+  linhas.push(`<pre>Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}</pre>`);
+  linhas.push(`<pre>Executado R$ ${libLocal.formatReal(contas.totais.feito)}</pre>`);
+  linhas.push(`<b>${anoMes} Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}</b>`);
 
   if (!digitado) {
     const ano = parseInt(anoMes.toString().substring(0, 4));
@@ -35,7 +28,12 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     const proximasContas = await extrato.exec({ anoMes: proximo, lib });
 
     linhas.push('');
-    linhas = linhas.concat(mostrar(proximasContas, proximo));
+
+    for (const conta of proximasContas.lista) {
+      conta.previsto !== 0 && linhas.push(`<pre>${conta.banco.toUpperCase()} - Previsto R$ ${libLocal.formatReal(conta.previsto)}</pre>`);
+    }
+
+    linhas.push(`<b>${proximo} Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}</b>`);
   }
 
   callback(linhas);  
