@@ -1,82 +1,43 @@
+const extrato = require('./dto/extrato.js');
+
 const exec = async ({ parametros, callback, lib, libLocal }) => {
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
     : null;
+  const conta = parametros.shift();
   const linhas = [];
   const totais = {
     feito: 0,
     previsto: 0,
   };
 
-  const dataMin = new Date();
-  const dataMax = new Date();
+  const contas = await extrato.exec({ anoMes, lib, conta });
 
-  dataMin.setDate(1);
-  dataMin.setHours(0);
-  dataMin.setMinutes(0);
-  dataMin.setSeconds(0);
-  dataMin.setMilliseconds(0);
+  for (const c of contas.lista) {
+    c.extrato.length > 0 && linhas.push(`-- Conta ${c.banco.toUpperCase()}`)
 
-  dataMax.setHours(23);
-  dataMax.setMinutes(59);
-  dataMax.setSeconds(59);
-  dataMax.setMilliseconds(999);
-
-  if (anoMes) {
-    dataMin.setFullYear(anoMes.toString().substring(0, 4))
-    dataMin.setMonth(anoMes.toString().substring(4)-1);
-
-    dataMax.setFullYear(anoMes.toString().substring(0, 4))
-    dataMax.setMonth(anoMes.toString().substring(4), 1);
-  } else {
-    dataMax.setMonth(dataMin.getMonth()+1, 1);
-  }
-
-  dataMax.setDate(dataMax.getDate()-1);
-
-  const { db } = lib.firebase;
-
-  const contas = await db.collection('contas').get();
-  for (const conta of contas.docs) {
-    let feito = 0;
-    let previsto = 0;
-
-    const extrato = await db.collection('contas').doc(conta.id).collection('extrato')
-      .where('data', '>=', dataMin.getTime())
-      .where('data', '<=', dataMax.getTime())
-      .orderBy('data')
-      .get();
-    for (const i of extrato.docs) {
-      const { data, status, valor, descritivo } = i.data();
-
-      feito += status === 'feito' ? parseInt(valor) : 0;
-      previsto += status.includes('previsto') ? parseInt(valor) : 0;
-
-      const formatStatus = status === 'previsto fixo'
+    for (const e of c.extrato) {
+      const formatStatus = e.status === 'previsto fixo'
         ? 'PF'
-        : status === 'feito'
+        : e.status === 'feito'
           ? 'OK'
-          : status === 'previsto'
+          : e.status === 'previsto'
             ? 'PC'
             : 'ND';
 
-      linhas.push(`${libLocal.formatData(data)} ${formatStatus} R$ ${libLocal.formatReal(valor)} - ${descritivo}`);
+      linhas.push(`<pre>${libLocal.formatData(e.data)} ${formatStatus} R$ ${libLocal.formatReal(e.valor)} - ${e.descritivo}</pre>`);
     }
 
-    totais.feito += feito;
-    totais.previsto += previsto;
-
-    extrato.size > 0 && linhas.push(`-- Conta ${conta.data().banco}`)
-    extrato.size > 0 && linhas.push(`== Previsto R$ ${libLocal.formatReal(previsto)}`);
-    extrato.size > 0 && linhas.push(`== Feito R$ ${libLocal.formatReal(feito)}`);
-    extrato.size > 0 && linhas.push(`== Total R$ ${libLocal.formatReal(previsto+feito)}`);
-    extrato.size > 0 && linhas.push('');
+    c.extrato.length > 0 && linhas.push(`== Previsto R$ ${libLocal.formatReal(c.previsto)}`);
+    c.extrato.length > 0 && linhas.push(`== Feito R$ ${libLocal.formatReal(c.feito)}`);
+    c.extrato.length > 0 && linhas.push(`== Total R$ ${libLocal.formatReal(c.previsto+c.feito)}`);
+    c.extrato.length > 0 && linhas.push('');
   }
 
   linhas.push('------ Geral ------');
-  linhas.push(`== Executado R$ ${libLocal.formatReal(totais.feito)}`);
-  linhas.push(`== Previsto R$ ${libLocal.formatReal(totais.previsto)}`);
-  linhas.push(`== Total R$ ${libLocal.formatReal(totais.feito+totais.previsto)}`);
+  linhas.push(`== Executado R$ ${libLocal.formatReal(contas.totais.feito)}`);
+  linhas.push(`== Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}`);
+  linhas.push(`== Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
 
   callback(linhas);
 }
@@ -84,4 +45,4 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 module.exports = {
   alias: ['conta', 'cc', 'ccl'],
   exec,
-}
+};
