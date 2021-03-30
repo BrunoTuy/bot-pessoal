@@ -1,88 +1,82 @@
-const exec = async ({ subComando, parametros, callback, banco, lib }) => {
-  if (parametros.length === 2) {
-    const linhas = [];
-    const ano = parametros.shift();
-    const mes = parametros.shift();
-    const dataMin = new Date();
-    const dataMax = new Date();
+const extrato = require('./dto/extrato.js');
 
-    dataMin.setFullYear(ano);
-    dataMin.setMonth(mes-1);
-    dataMin.setDate(1);
+const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+  if (parametros.length === 1) {
+    const linhas = [];
+    let extratosVazios = true;
+    const data = libLocal.entenderData(parametros.shift());
+    const dataMin = new Date(data);
+    const dataMax = new Date(data);
+
     dataMin.setHours(0);
     dataMin.setMinutes(0);
     dataMin.setSeconds(0);
     dataMin.setMilliseconds(0);
 
-    dataMax.setFullYear(ano);
-    dataMax.setMonth(mes-1);
     dataMax.setHours(23);
     dataMax.setMinutes(59);
     dataMax.setSeconds(59);
     dataMax.setMilliseconds(999);
 
-    const list = await banco.sqlite.all(`
-      SELECT *
-      FROM carteira_gastos_conta
-      WHERE data between ${dataMin.getTime()} AND ${dataMax.getTime()}
-      ORDER BY data ASC
-    `);
+    const contas = await extrato.exec({ dataMin, dataMax, lib });
 
-    for (const i of list) {
-      linhas.push(`::${i.id}:: ${lib.formatData(i.data)} R$ ${lib.formatReal(i.valor)} - ${i.conta} - ${i.descritivo}`);
+    for (const c of contas.lista) {
+      for (const e of c.extrato) {
+        extratosVazios = false;
+        linhas.push(`<pre>${c.id} ${e.id} R$ ${libLocal.formatReal(e.valor)} - ${c.banco} - ${e.descritivo}</pre>`);
+        linhas.push('');
+      }
     }
 
-    linhas.push('');
-    linhas.push(`${subComando} {id} {data} {valor em centavos}`);
+    if (extratosVazios) {
+      linhas.push(`Nenhuma movimentação encontrada no dia ${libLocal.formatData(data)}`);
+    } else {
+      linhas.push(`${subComando} {id conta} {id extrato} data {data}`);
+      linhas.push(`${subComando} {id conta} {id extrato} valor {valor em centavos}`);
+      linhas.push(`${subComando} {id conta} {id extrato} descritivo {descritivo}`);
+    }
 
     callback(linhas);
-  } else if (parametros.length === 3) {
-    const id = parametros.shift();
-    const data = parametros.shift().toString();
-    const strValor = parametros.shift().toString();
+  } else if (parametros.length >= 4) {
+    const { db } = lib.firebase;
+    const contaId = parametros.shift();
+    const extratoId = parametros.shift();
+    const tipoDado = parametros.shift().toString().toLowerCase();
+    const dado = parametros.join(' ');
+    const objSet = {};
+    const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(extratoId);
 
-    const list = await banco.sqlite.all(`
-      SELECT *
-      FROM carteira_gastos_conta
-      WHERE id = ${id}
-      ORDER BY data ASC
-    `);
+    if (tipoDado === 'data') {
+      const dataSet = libLocal.entenderData(dado.toString().toLowerCase());
 
-    if (list.length !== 1) {
-      callback('Registro não encontrado.');
+      objSet.data = dataSet.getTime();
+      objSet.dataTexto = dataSet;
+    } else if (tipoDado === 'valor') {
+      objSet.valor = dado.substring(dado.length-1) === 'c'
+        ? dado.substring(0, dado.length-1)
+        : dado*-1;
+    } else if (tipoDado === 'descritivo') {
+      objSet.descritivo = dado;
     } else {
-      const dataReg = new Date(list[0].data);
+      callback([
+        'Parâmetros incorretos.',
+        'Você pode alterar data, valor e descritivo'
+      ]);
+    }
 
-      if (data.length < 3) {
-        dataReg.setDate(data);
-      } else {
-        dataReg.setFullYear(data.substring(0, 4));
-        dataReg.setMonth(data.substring(4, 6)-1, data.substring(6, 8));
-      }
-
-      const valor = strValor.substring(strValor.length-1) === 'c'
-        ? strValor.substring(0, strValor.length-1)
-        : strValor*-1;
-
-      banco.sqlite.run(`
-        UPDATE carteira_gastos_conta
-          SET data = ${dataReg.getTime()},
-              valor = ${valor}
-        WHERE id = ${id}
-      `);
-
-      callback('Registro atualizado')
+    if (objSet !== {}) {
+      docRef.update(objSet);
+      callback('Registro atualizado com sucesso.');
     }
   } else {
     callback([
       'Exemplo do comando abaixo',
-      `${subComando} {ano} {mes}`
+      `${subComando} {data}`
     ]);
   }
 }
 
 module.exports = {
-  hidden: true,
   alias: ['caj', 'ccaj'],
   exec,
 }

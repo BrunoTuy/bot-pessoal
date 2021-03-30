@@ -17,7 +17,7 @@ fs
 
     list[name] = obj;
 
-    !obj.hidden && comandos.push(`${name}${obj.alias ? ` -> ${obj.alias.join('|')}` : ''}`);
+    !obj.hidden && comandos.push(`${name}${obj.alias ? ` -> ${obj.alias.join(' ')}` : ''}`);
   });
 
 

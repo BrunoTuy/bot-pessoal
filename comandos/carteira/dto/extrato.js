@@ -1,28 +1,34 @@
-const exec = async ({ anoMes, lib }) => {
+const exec = async ({ anoMes, lib, dataMin: paramDataMin, dataMax: paramDataMax }) => {
   const lista = [];
   const totais = {
     feito: 0,
     previsto: 0,
   };
 
-  const dataMin = new Date();
-  const dataMax = new Date();
+  const dataMin = paramDataMin || new Date();
+  const dataMax = paramDataMax || new Date();
 
-  dataMin.setFullYear(anoMes.toString().substring(0, 4))
-  dataMin.setMonth(anoMes.toString().substring(4)-1);
-  dataMin.setDate(1);
-  dataMin.setHours(0);
-  dataMin.setMinutes(0);
-  dataMin.setSeconds(0);
-  dataMin.setMilliseconds(0);
+  if (anoMes) {
+    if (!paramDataMin) {
+      dataMin.setFullYear(anoMes.toString().substring(0, 4))
+      dataMin.setMonth(anoMes.toString().substring(4)-1);
+      dataMin.setDate(1);
+      dataMin.setHours(0);
+      dataMin.setMinutes(0);
+      dataMin.setSeconds(0);
+      dataMin.setMilliseconds(0);
+    }
 
-  dataMax.setFullYear(anoMes.toString().substring(0, 4))
-  dataMax.setMonth(anoMes.toString().substring(4), 1);
-  dataMax.setHours(23);
-  dataMax.setMinutes(59);
-  dataMax.setSeconds(59);
-  dataMax.setMilliseconds(999);
-  dataMax.setDate(dataMax.getDate()-1);
+    if (!paramDataMax) {
+      dataMax.setFullYear(anoMes.toString().substring(0, 4))
+      dataMax.setMonth(anoMes.toString().substring(4), 1);
+      dataMax.setHours(23);
+      dataMax.setMinutes(59);
+      dataMax.setSeconds(59);
+      dataMax.setMilliseconds(999);
+      dataMax.setDate(dataMax.getDate()-1);
+    }
+  }
 
   const { db } = lib.firebase;
   const contas = await db.collection('contas').get();

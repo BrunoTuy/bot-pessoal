@@ -1,6 +1,5 @@
 const extrato = require('./dto/extrato.js');
 
-
 const exec = async ({ parametros, callback, lib, libLocal }) => {
   let linhas = [];
   const data = new Date();
