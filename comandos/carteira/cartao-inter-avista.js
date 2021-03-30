@@ -1,4 +1,4 @@
-const cartaoAdd = require('./cartao-add.js');
+const cartaoAdd = require('./cartao/add.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (!parametros || parametros.length < 3) {

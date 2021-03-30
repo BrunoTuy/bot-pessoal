@@ -17,7 +17,11 @@ fs
 
     list[name] = obj;
 
-    !obj.hidden && comandos.push(`${name}${obj.alias ? ` -> ${obj.alias.join(' ')}` : ''}`);
+    if (obj.alias.length === 1) {
+      !obj.hidden && comandos.push(`${obj.alias[0]} -> ${obj.descricao || name}`);
+    } else {
+      !obj.hidden && comandos.push(`${name}${obj.alias ? ` -> ${obj.alias.join(' ')}` : ''}`);
+    }
   });
 
 

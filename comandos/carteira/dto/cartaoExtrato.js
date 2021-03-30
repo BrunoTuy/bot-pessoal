@@ -4,11 +4,11 @@ const exec = async ({ competencia, cartao: cartaoNome, lib }) => {
   const cartoesCollection = await db.collection('cartoes').get();
 
   for (const cartao of cartoesCollection.docs) {
-    if (!cartaoNome || cartaoNome === cartao.data().nome) {
+    if ((!cartaoNome || cartaoNome === cartao.data().nome) && (competencia || cartao.data().competencia)) {
       let total = 0;
       const fatura = [];
       const faturaCollection = await db.collection('cartoes').doc(cartao.id).collection('fatura')
-        .where('competencia', '==', parseInt(competencia))
+        .where('competencia', '==', parseInt(competencia || cartao.data().competencia))
         .orderBy('data')
         .get();
 

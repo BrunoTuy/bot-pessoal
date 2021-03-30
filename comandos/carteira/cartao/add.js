@@ -1,5 +1,5 @@
-const inserir = require('./dto/inserirCartaoFatura.js');
-const faturas = require('./cartao-gerar-faturas.js');
+const inserir = require('../dto/inserirCartaoFatura.js');
+const faturas = require('./gerar-faturas.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (!parametros || parametros.length < 5) {
@@ -63,6 +63,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 };
 
 module.exports = {
-  alias: ['cda', 'cdadd'],
+  alias: ['a'],
+  descricao: 'Adicionar',
   exec,
 };

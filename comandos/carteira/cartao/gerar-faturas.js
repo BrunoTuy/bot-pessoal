@@ -1,4 +1,4 @@
-const cartaoExtrato = require('./dto/cartaoExtrato.js');
+const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
 const exec = async ({ parametros, callback, lib, libLocal }) => {
   const { db } = lib.firebase;
@@ -43,7 +43,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 }
 
 module.exports = {
-  hidden: true,
-  alias: ['cartao-fatura', 'cf', 'cdf'],
+  alias: ['gfat'],
+  descricao: 'Gerar faturas',
   exec,
 }
