@@ -19,10 +19,7 @@ if (process.env.NODE_ENV === 'production') {
 const app = express();
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
-const banco = require( './lib/banco.js' )(firebase);
-const sqlite = require( './lib/sqlite.js' );
-
-banco.sqlite = sqlite;
+const banco = require( './lib/banco.js' )( firebase );
 
 bot.on( 'message', async ( msg ) => {
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
