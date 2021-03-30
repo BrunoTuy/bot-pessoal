@@ -1,4 +1,4 @@
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const { db } = lib.firebase;
 
   if (parametros.length === 4) {
@@ -58,6 +58,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 }
 
 module.exports = {
-  alias: ['cxp', 'ccxp'],
+  alias: ['xp'],
+  descricao: 'Executar pendência',
   exec,
 }

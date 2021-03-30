@@ -1,4 +1,4 @@
-const extrato = require('./dto/extrato.js');
+const extrato = require('../dto/extrato.js');
 
 const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
   if (parametros.length === 1) {
@@ -77,6 +77,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 }
 
 module.exports = {
-  alias: ['caj', 'ccaj'],
+  alias: ['e'],
+  descricao: 'Editar',
   exec,
 }

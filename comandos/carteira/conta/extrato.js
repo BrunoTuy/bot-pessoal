@@ -1,4 +1,4 @@
-const extrato = require('./dto/extrato.js');
+const extrato = require('../dto/extrato.js');
 
 const exec = async ({ parametros, callback, lib, libLocal }) => {
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
@@ -41,6 +41,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 }
 
 module.exports = {
-  alias: ['conta', 'cc', 'ccl'],
+  alias: ['ext'],
+  descricao: 'Mostrar extrato',
   exec,
 };

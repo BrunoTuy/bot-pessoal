@@ -63,6 +63,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
 };
 
 module.exports = {
-  alias: ['cca', 'ccadd'],
+  alias: ['a'],
+  descricao: 'Adicionar',
   exec,
 };
