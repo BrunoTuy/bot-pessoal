@@ -25,17 +25,17 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
             ? '🗓'
             : '❓';
 
-      linhas.push(`<pre>${libLocal.formatData(e.data)} ${formatStatus} R$ ${libLocal.formatReal(e.valor)} - ${e.descritivo}</pre>`);
+      linhas.push(`<pre>${formatStatus} ${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} - ${e.descritivo}</pre>`);
     }
 
-    c.extrato.length > 0 && linhas.push(`Total R$ ${libLocal.formatReal(c.previsto+c.feito)} (🗓R$${libLocal.formatReal(c.previsto)} ✅R$${libLocal.formatReal(c.feito)})`);
+    c.extrato.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(c.previsto+c.feito)} (🗓R$${libLocal.formatReal(c.previsto)} ✅R$${libLocal.formatReal(c.feito)})`);
     c.extrato.length > 0 && linhas.push('');
   }
 
   linhas.push('------ Geral ------');
-  linhas.push(`== ✅ Executado R$ ${libLocal.formatReal(contas.totais.feito)}`);
-  linhas.push(`== 🗓 Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}`);
-  linhas.push(`== Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
+  linhas.push(`✅ Executado R$ ${libLocal.formatReal(contas.totais.feito)}`);
+  linhas.push(`🗓 Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}`);
+  linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
 
   callback(linhas);
 }
