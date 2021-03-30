@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Bot assistente pessoal",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "dev": "nodemon main.js"
   },
   "contributors": [
     {
@@ -17,6 +18,7 @@
     "firebase-admin": "^9.5.0",
     "lowdb": "^1.0.0",
     "node-telegram-bot-api": "^0.50.0",
+    "nodemon": "^2.0.7",
     "sqlite": "^4.0.17",
     "sqlite3": "^5.0.0"
   }
