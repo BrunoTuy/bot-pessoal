@@ -43,6 +43,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 }
 
 module.exports = {
+  hidden: true,
   alias: ['cartao-fatura', 'cf', 'cdf'],
   exec,
 }
