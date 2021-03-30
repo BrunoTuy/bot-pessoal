@@ -28,9 +28,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
       linhas.push(`<pre>${libLocal.formatData(e.data)} ${formatStatus} R$ ${libLocal.formatReal(e.valor)} - ${e.descritivo}</pre>`);
     }
 
-    c.extrato.length > 0 && linhas.push(`== Previsto R$ ${libLocal.formatReal(c.previsto)}`);
-    c.extrato.length > 0 && linhas.push(`== Feito R$ ${libLocal.formatReal(c.feito)}`);
-    c.extrato.length > 0 && linhas.push(`== Total R$ ${libLocal.formatReal(c.previsto+c.feito)}`);
+    c.extrato.length > 0 && linhas.push(`Total R$ ${libLocal.formatReal(c.previsto+c.feito)} (Pend.R$${libLocal.formatReal(c.previsto)} Exec.R$${libLocal.formatReal(c.feito)})`);
     c.extrato.length > 0 && linhas.push('');
   }
 
