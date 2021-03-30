@@ -8,12 +8,13 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     : data.getFullYear()*100+(data.getMonth() > 10
       ? 101
       : data.getMonth()+2);
+  const cartao = parametros.shift();
   const linhas = [];
   let total = 0;
 
   linhas.push(`------ ${competencia} ------`);
 
-  const cartoes = await cartaoExtrato.exec({ lib, competencia });
+  const cartoes = await cartaoExtrato.exec({ lib, competencia, cartao });
 
   for (const cartao of cartoes) {
     for (const i of cartao.fatura) {
@@ -25,7 +26,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     cartao.fatura.length > 0 && linhas.push('');
   }
 
-  linhas.push('------ Geral ------');
   linhas.push(`== Total R$ ${libLocal.formatReal(total)}`);
 
   callback(linhas);
