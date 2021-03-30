@@ -29,14 +29,14 @@ module.exports = {
   exec: async ({ subComando, callback, comando, contexto, parametros, original, lib, libLocal }) => {
     const subSubComando = parametros && parametros.length > 0
       ? parametros.shift().toLowerCase()
-      : 'ext';
+      : 'sld';
 
     try {
       if (subSubComando && list[subSubComando] && list[subSubComando].exec) {
         await list[subSubComando].exec({ subComando: `${subComando} ${subSubComando}`, parametros, callback, lib, libLocal });
       } 
 
-      if (subSubComando === 'ext' || !list[subSubComando] || !list[subSubComando].exec) {
+      if (subSubComando === 'sld' || !list[subSubComando] || !list[subSubComando].exec) {
         callback(['Outros comandos', ''].concat(comandos.map(i => `${subComando} ${i}`)).join('\n'));
       }
     } catch (e) {
