@@ -1,9 +1,9 @@
-const extrato = require('../dto/extrato.js');
+const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
 const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
   if (parametros.length === 1) {
     const linhas = [];
-    let extratosVazios = true;
+    let faturasVazias = true;
     const data = libLocal.entenderData(parametros.shift());
     const dataMin = new Date(data);
     const dataMax = new Date(data);
@@ -18,34 +18,34 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     dataMax.setSeconds(59);
     dataMax.setMilliseconds(999);
 
-    const contas = await extrato.exec({ dataMin, dataMax, lib });
+    const cartoes = await cartaoExtrato.exec({ dataMin, dataMax, lib });
 
-    for (const c of contas.lista) {
-      for (const e of c.extrato) {
-        extratosVazios = false;
-        linhas.push(`<pre>${c.id} ${e.id} R$ ${libLocal.formatReal(e.valor)} - ${c.banco} - ${e.descritivo}${e.tags ? ` ${e.tags.map(t => `[${t}]`).join(' ')}` : ''}</pre>`);
+    for (const c of cartoes) {
+      for (const f of c.fatura) {
+        faturasVazias = false;
+        linhas.push(`<pre>${c.id} ${f.id} R$ ${libLocal.formatReal(f.valor)} - ${c.nome} - ${f.descritivo}${f.tags ? ` ${f.tags.map(t => `[${t}]`).join(' ')}` : ''}</pre>`);
         linhas.push('');
       }
     }
 
-    if (extratosVazios) {
+    if (faturasVazias) {
       linhas.push(`Nenhuma movimentação encontrada no dia ${libLocal.formatData(data)}`);
     } else {
-      linhas.push(`${subComando} {id conta} {id extrato} data {data}`);
-      linhas.push(`${subComando} {id conta} {id extrato} valor {valor em centavos}`);
-      linhas.push(`${subComando} {id conta} {id extrato} tags {+|-} {nome da tag}`);
-      linhas.push(`${subComando} {id conta} {id extrato} descritivo {descritivo}`);
+      linhas.push(`${subComando} {id cartão} {id fatura} data {data}`);
+      linhas.push(`${subComando} {id cartão} {id fatura} valor {valor em centavos}`);
+      linhas.push(`${subComando} {id cartão} {id fatura} tags {+|-} {nome da tag}`);
+      linhas.push(`${subComando} {id cartão} {id fatura} descritivo {descritivo}`);
     }
 
     callback(linhas);
   } else if (parametros.length >= 4) {
     const { db } = lib.firebase;
-    const contaId = parametros.shift();
-    const extratoId = parametros.shift();
+    const cartaoId = parametros.shift();
+    const faturaId = parametros.shift();
     const tipoDado = parametros.shift().toString().toLowerCase();
     const dado = parametros.join(' ').trim();
     const objSet = {};
-    const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(extratoId);
+    const docRef = db.collection('cartoes').doc(cartaoId).collection('fatura').doc(faturaId);
 
     if (tipoDado === 'data') {
       const dataSet = libLocal.entenderData(dado.toString().toLowerCase());
@@ -53,9 +53,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
       objSet.data = dataSet.getTime();
       objSet.dataTexto = dataSet;
     } else if (tipoDado === 'valor') {
-      objSet.valor = dado.substring(dado.length-1) === 'c'
-        ? dado.substring(0, dado.length-1)
-        : dado*-1;
+      objSet.valor = parseInt(dado);
     } else if (tipoDado === 'descritivo') {
       objSet.descritivo = dado;
     } else if (tipoDado === 'tags') {
@@ -73,7 +71,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
         callback([
           'Parâmetros incorretos.',
           'Você pode adicionar ou remover uma tag',
-          `${subComando} {id conta} {id extrato} tags {+|-} {nome da tag}`
+          `${subComando} {id cartão} {id fatura} tags {+|-} {nome da tag}`
         ]);        
       }
     } else {

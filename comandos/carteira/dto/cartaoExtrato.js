@@ -1,18 +1,24 @@
-const exec = async ({ competencia, cartao: cartaoNome, lib }) => {
+const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) => {
   const { db } = lib.firebase;
   const cartoes = [];
   const cartoesCollection = await db.collection('cartoes').get();
 
   for (const cartao of cartoesCollection.docs) {
-    if ((!cartaoNome || cartaoNome === cartao.data().nome) && (competencia || cartao.data().competencia)) {
+    if ((!cartaoNome || cartaoNome === cartao.data().nome) && (competencia || cartao.data().competencia || (dataMin && dataMax))) {
       let total = 0;
       const fatura = [];
-      const faturaCollection = await db.collection('cartoes').doc(cartao.id).collection('fatura')
-        .where('competencia', '==', parseInt(competencia || cartao.data().competencia))
-        .orderBy('data')
-        .get();
+      const faturaCollection = dataMin && dataMax 
+        ? db.collection('cartoes').doc(cartao.id).collection('fatura')
+          .where('data', '>=', dataMin.getTime())
+          .where('data', '<=', dataMax.getTime())
+        : db.collection('cartoes').doc(cartao.id).collection('fatura')
+          .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
 
-      for (const i of faturaCollection.docs) {
+      const list = await faturaCollection
+          .orderBy('data')
+          .get();
+
+      for (const i of list.docs) {
         fatura.push({...i.data(), id: i.id});
         total += parseInt(i.data().valor);
       }

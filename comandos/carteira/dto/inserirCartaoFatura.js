@@ -1,7 +1,7 @@
 const exec = async ({ lib, params, callback }) => {
   const { cartao, data, valor, descritivo, parcela, parcelas, competencia, recorrente } = params;
   const obj = await lib.firebase.db.collection('cartoes').doc(cartao).collection('fatura');
-  obj.add({
+  const retorno = await obj.add({
     descritivo,
     competencia,
     dataTexto: data,
@@ -13,10 +13,14 @@ const exec = async ({ lib, params, callback }) => {
   });
 
   callback && callback([
-    `Cartão.fatura ${cartao} $ ${valor/100} ${parcela ? `${parcela}/${parcelas}` : ''}`,
+    `${cartao} ${retorno.id} $ ${valor/100} ${parcela ? `${parcela}/${parcelas}` : ''}`,
     `${recorrente ? recorrente.id : ''} ${descritivo}`,
-    `${competencia} ${data}`
-  ]);  
+    `${competencia} ${data}`,
+    '',
+    'Segue comando para inserir tags'
+  ]);
+
+  callback && callback(`cd e ${cartao} ${retorno.id} tags + {tag nome}`);
 }
 
 module.exports = exec;
