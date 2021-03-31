@@ -11,7 +11,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
   if (!paramDataMin) {
     if (anoMes) {
       dataMin.setFullYear(anoMes.toString().substring(0, 4))
-      dataMin.setMonth(anoMes.toString().substring(4)-1);
+      dataMin.setMonth(anoMes.toString().substring(4)-1, 1);
     }
 
     dataMin.setDate(1);
