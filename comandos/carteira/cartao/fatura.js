@@ -18,7 +18,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
   for (const cartao of cartoes) {
     for (const i of cartao.fatura) {
-      linhas.push(`${libLocal.formatData(i.data)} R$ ${libLocal.formatReal(i.valor)} ${i.total_parcelas > 1 ? ` ${i.parcela}/${i.total_parcelas}` : ''} - ${i.descritivo}`);
+      linhas.push(`${libLocal.formatData(i.data, 'mes-dia')} R$ ${libLocal.formatReal(i.valor)} ${i.total_parcelas > 1 ? ` ${i.parcela}/${i.total_parcelas}` : ''} - ${i.descritivo}`);
     }
 
     total += cartao.total;

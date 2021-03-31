@@ -25,7 +25,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
             ? '🗓'
             : '❓';
 
-      linhas.push(`<pre>${formatStatus} ${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} - ${e.descritivo}</pre>`);
+      linhas.push(`<pre>${formatStatus} ${libLocal.formatData(e.data, 'dia')} R$ ${libLocal.formatReal(e.valor)} - ${e.descritivo}</pre>`);
     }
 
     c.extrato.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(c.previsto+c.feito)} (🗓R$${libLocal.formatReal(c.previsto)} ✅R$${libLocal.formatReal(c.feito)})`);
