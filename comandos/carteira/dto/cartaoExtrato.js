@@ -6,6 +6,9 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) 
   for (const cartao of cartoesCollection.docs) {
     if ((!cartaoNome || cartaoNome === cartao.data().nome) && (competencia || cartao.data().competencia || (dataMin && dataMax))) {
       let total = 0;
+      let parcelado = 0;
+      let recorrente = 0;
+      let avista = 0;
       const fatura = [];
       const faturaCollection = dataMin && dataMax 
         ? db.collection('cartoes').doc(cartao.id).collection('fatura')
@@ -21,13 +24,19 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) 
       for (const i of list.docs) {
         fatura.push({...i.data(), id: i.id});
         total += parseInt(i.data().valor);
+        parcelado += i.data().total_parcelas > 1 ? parseInt(i.data().valor) : 0;
+        recorrente += i.data().recorrente !== null ? parseInt(i.data().valor) : 0;
+        avista += i.data().total_parcelas === 1 ? parseInt(i.data().valor) : 0;
       }
 
       cartoes.push({
         ...cartao.data(),
         id: cartao.id,
         fatura,
-        total
+        total,
+        parcelado,
+        recorrente,
+        avista
       });
     }
   }

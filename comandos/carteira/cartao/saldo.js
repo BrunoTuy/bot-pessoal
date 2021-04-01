@@ -9,21 +9,37 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const cartao = parametros.shift();
   const linhas = [];
   const pendencias = [];
-  let total = 0;
+  const totais = {
+    geral: 0,
+    avista: 0,
+    parcelado: 0,
+    recorrente: 0
+  };
 
   const cartoes = await cartaoExtrato.exec({ lib, competencia });
 
   for (const cartao of cartoes) {
-    total += cartao.total;
-    linhas.push(`<pre>${cartao.nome.toUpperCase()} 🗓${competencia || cartao.competencia} R$ ${libLocal.formatReal(cartao.total)}</pre>`);
+    totais.geral += cartao.total;
+    totais.avista += cartao.avista;
+    totais.parcelado += cartao.parcelado;
+    totais.recorrente += cartao.recorrente;
+
+    linhas.push(`<b>${cartao.nome.toUpperCase()}</b> 🗓 <pre>${competencia || cartao.competencia}</pre>`);
+    linhas.push(`<pre>1️⃣ R$ ${libLocal.formatReal(cartao.avista)}</pre>`);
+    linhas.push(`<pre>🔢 R$ ${libLocal.formatReal(cartao.parcelado)}</pre>`);
+    linhas.push(`<pre>🔁 R$ ${libLocal.formatReal(cartao.recorrente)}</pre>`);
+    linhas.push(`<pre>🧮 R$ ${libLocal.formatReal(cartao.total)}</pre>`);
+    linhas.push('');
 
     !cartao.banco && pendencias.push(`❗️ Define o banco do cartão ${cartao.nome}`);
     !cartao.vencimento && pendencias.push(`❗️ Define o vencimento do cartão ${cartao.nome}`);
     !cartao.competencia && pendencias.push(`❗️ Define a competência do cartão ${cartao.nome}`);
   }
 
-  linhas.push('');
-  linhas.push(`🧮 Total R$ ${libLocal.formatReal(total)}`);
+  linhas.push(`1️⃣ À vista R$ ${libLocal.formatReal(totais.avista)}`);
+  linhas.push(`🔢 Parcelado R$ ${libLocal.formatReal(totais.parcelado)}`);
+  linhas.push(`🔁 Recorrente R$ ${libLocal.formatReal(totais.recorrente)}`);
+  linhas.push(`🧮 Total R$ ${libLocal.formatReal(totais.geral)}`);
 
   callback(linhas);
   pendencias && pendencias.length > 0 && callback(pendencias);
