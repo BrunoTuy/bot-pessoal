@@ -22,11 +22,14 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) 
           .get();
 
       for (const i of list.docs) {
-        fatura.push({...i.data(), id: i.id});
+        const ehRecorrente = i.data().recorrente && i.data().recorrente !== null && i.data().recorrente.id;
+
         total += parseInt(i.data().valor);
-        parcelado += i.data().total_parcelas > 1 ? parseInt(i.data().valor) : 0;
-        recorrente += i.data().recorrente !== null ? parseInt(i.data().valor) : 0;
-        avista += i.data().total_parcelas === 1 ? parseInt(i.data().valor) : 0;
+        recorrente += ehRecorrente ? parseInt(i.data().valor) : 0;
+        parcelado += !ehRecorrente && i.data().total_parcelas > 1 ? parseInt(i.data().valor) : 0;
+        avista += !ehRecorrente && i.data().total_parcelas === 1 ? parseInt(i.data().valor) : 0;
+
+        fatura.push({...i.data(), id: i.id});
       }
 
       cartoes.push({
