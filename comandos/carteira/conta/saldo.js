@@ -21,6 +21,20 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   linhas.push(`🗓 Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}`);
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
 
+  if (!anoMes) {
+    const data = new Date();
+    const novoAnoMes = libLocal.calcularCompetencia({ parcela: 2 });
+    const proximoMes = await extrato.exec({ anoMes: novoAnoMes, lib });
+
+    linhas.push('');
+    linhas.push(`--- ${novoAnoMes} ---`);
+    for (const c of proximoMes.lista) {
+      linhas.push(`<pre>🗓 ${c.banco.toUpperCase()} R$ ${libLocal.formatReal(c.previsto+c.feito)}</pre>`);
+    }
+
+    linhas.push(`🗓 Previsto R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
+  }
+
   callback(linhas);
 }
 
