@@ -32,7 +32,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
       linhas.push(`<pre>🗓 ${c.banco.toUpperCase()} R$ ${libLocal.formatReal(c.previsto+c.feito)}</pre>`);
     }
 
-    linhas.push(`🗓 Previsto R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
+    linhas.push(`🗓 Previsto R$ ${libLocal.formatReal(proximoMes.totais.feito+proximoMes.totais.previsto)}`);
   }
 
   callback(linhas);
