@@ -18,6 +18,8 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     dataMax.setSeconds(59);
     dataMax.setMilliseconds(999);
 
+    linhas.push(`Data ${libLocal.formatData(data)}`);
+
     const cartoes = await cartaoExtrato.exec({ dataMin, dataMax, lib });
 
     for (const c of cartoes) {
@@ -29,7 +31,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     }
 
     if (faturasVazias) {
-      linhas.push(`Nenhuma movimentação encontrada no dia ${libLocal.formatData(data)}`);
+      linhas.push('Nenhuma movimentação encontrada nesta data');
     } else {
       linhas.push(`${subComando} {id cartão} {id fatura} data {data}`);
       linhas.push(`${subComando} {id cartão} {id fatura} valor {valor em centavos}`);
