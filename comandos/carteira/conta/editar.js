@@ -99,6 +99,6 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 
 module.exports = {
   alias: ['e'],
-  descricao: 'Editar',
+  descricao: 'Editar recorrente',
   exec,
 }
