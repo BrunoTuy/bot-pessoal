@@ -8,6 +8,7 @@ const exec = async ({ lib }) => {
     const recorrentes = await db.collection('contas').doc(conta.id).collection('recorrente').orderBy('dia').get();
     const obj = {
       ...conta.data(),
+      id: conta.id,
       lista: []
     };
   

@@ -10,11 +10,11 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     const { nome } = cartao;
   
     for (const rec of cartao.lista) {
-      const { dia, valor, descritivo } = rec;
+      const { dia, valor, descritivo, tags } = rec;
 
       totalCartao += valor;
 
-      linhas.push(`<pre>D.${dia} R$ ${libLocal.formatReal(valor)} ${descritivo}</pre>`);
+      linhas.push(`<pre>D.${dia} R$ ${libLocal.formatReal(valor)} ${descritivo} ${(tags || []).map(t => `[${t}]`).join(' ')}</pre>`);
     }
 
     total += totalCartao;

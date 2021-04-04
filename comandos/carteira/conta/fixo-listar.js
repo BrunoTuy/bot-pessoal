@@ -10,11 +10,11 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     const { banco } = conta;
   
     for (const rec of conta.lista) {
-      const { dia, valor, descritivo } = rec;
+      const { dia, valor, descritivo, tags } = rec;
 
       totalConta += valor;
 
-      linhas.push(`<pre>D.${dia} R$ ${libLocal.formatReal(valor)} ${descritivo}</pre>`);
+      linhas.push(`<pre>D.${dia} R$ ${libLocal.formatReal(valor)} ${descritivo} ${(tags || []).map(t => `[${t}]`).join(' ')}</pre>`);
     }
 
     total += totalConta;
