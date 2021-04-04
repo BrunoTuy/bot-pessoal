@@ -18,7 +18,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       const conta = parametrosObj ? parametrosObj.conta : parametros.shift();
       const strValor = (parametrosObj ? parametrosObj.valor : parametros.shift()).toString();
       const descritivo = parametrosObj ? parametrosObj.descritivo : parametros.join(' ');
-      const recorrente = parametrosObj ? parametrosObj.recorrente : null;
+      const recorrente = parametrosObj && parametrosObj.recorrente ? parametrosObj.recorrente : null;
       const tags = parametrosObj && parametrosObj.tags ? parametrosObj.tags : [];
       const { db } = lib.firebase;
 
