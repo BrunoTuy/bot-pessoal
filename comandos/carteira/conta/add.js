@@ -19,6 +19,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       const strValor = (parametrosObj ? parametrosObj.valor : parametros.shift()).toString();
       const descritivo = parametrosObj ? parametrosObj.descritivo : parametros.join(' ');
       const recorrente = parametrosObj ? parametrosObj.recorrente : null;
+      const tags = parametrosObj && parametrosObj.tags ? parametrosObj.tags : [];
       const { db } = lib.firebase;
 
       const queryRef = db.collection('contas').where('banco', '==', conta);
@@ -48,14 +49,16 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           valor: parseInt(valor),
           descritivo,
           status,
-          recorrente
+          recorrente,
+          tags
         });
 
         callback([
           `Cadastrado ${descritivo}`,
           `${conta}`,
           `Em ${data}`,
-          `R$ ${valor/100}`
+          `R$ ${valor/100}`,
+          `${(tags || []).map(t => `[${t}]`).join(' ')}`
         ]);
       }
     }
