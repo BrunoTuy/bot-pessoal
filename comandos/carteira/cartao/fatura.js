@@ -46,15 +46,21 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         ? i.descritivo
         : null;
 
-      linhas.push(`<pre>${status} ${libLocal.formatData(i.data, 'mes-dia')} R$ ${libLocal.formatReal(i.valor)}${parcelas || ''} ${tags || '-'} ${descricao || ''}</pre>`);
+      const tipo = i.tipo === 'recorrente'
+        ? '🔁'
+        : i.tipo === 'parcelado'
+          ? '🔢'
+          : '1️⃣';
+
+      linhas.push(`<pre>${status} ${tipo} ${libLocal.formatData(i.data, 'mes-dia')} R$ ${libLocal.formatReal(i.valor)}${parcelas || ''} ${tags || '-'} ${descricao || ''}</pre>`);
     }
 
     total += cartao.total;
-    cartao.fatura.length > 0 && linhas.push(`== ${cartao.nome} R$ ${libLocal.formatReal(cartao.total)}`);
+    cartao.fatura.length > 0 && linhas.push(`🧮 ${cartao.nome} R$ ${libLocal.formatReal(cartao.total)}`);
     cartao.fatura.length > 0 && linhas.push('');
   }
 
-  linhas.push(`== Total R$ ${libLocal.formatReal(total)}`);
+  linhas.push(`🧮 Total R$ ${libLocal.formatReal(total)}`);
 
   callback(linhas);
 }
