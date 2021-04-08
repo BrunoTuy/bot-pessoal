@@ -13,14 +13,18 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const contas = await consultarPoupanca.exec({ anoMes, lib });
 
   for (const conta of contas) {
-    // for (const e of conta.extrato) {
-    //   const { valor, data } = e;
+    for (const e of conta.extrato) {
+      const { valor, data, status } = e;
+      const formatStatus = status === 'feito'
+        ? '✅'
+        : '🗓';
 
-    //   linhas.push(`<pre>${libLocal.formatData(data, 'mes-dia')} R$ ${libLocal.formatReal(valor*-1)}</pre>`);
-    // }
+      linhas.push(`<pre>${formatStatus} ${libLocal.formatData(data, 'mes-dia')} R$ ${libLocal.formatReal(valor*-1)}</pre>`);
+    }
 
     total += conta.total;
-    linhas.push(`<pre>${conta.banco.toUpperCase()} R$ ${libLocal.formatReal(conta.total)}</pre>`);
+    linhas.push(`🧮 ${conta.banco.toUpperCase()} R$ ${libLocal.formatReal(conta.total)}`);
+    linhas.push('')
   }
 
   linhas.push(`🧮 R$ ${libLocal.formatReal(total)}`);
@@ -29,7 +33,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 }
 
 module.exports = {
-  alias: ['sld'],
+  alias: ['ext'],
   descricao: 'Mostrar saldo',
   exec,
 };
