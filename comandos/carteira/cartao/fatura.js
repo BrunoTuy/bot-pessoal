@@ -8,7 +8,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     : data.getFullYear()*100+(data.getMonth() > 10
       ? 101
       : data.getMonth()+2);
-  const cartao = parametros.shift();
+  const cartao = !['t', 'd'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
+  const mostrarTags = (parametros.shift() || '').toLowerCase() === 't';
+  const mostrarDescricao = (parametros.shift() || '').toLowerCase() === 'd';
   const linhas = [];
   let total = 0;
 
@@ -16,9 +18,35 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
   const cartoes = await cartaoExtrato.exec({ lib, competencia, cartao });
 
+  data.setHours(1);
+  data.setMinutes(0);
+  data.setSeconds(0);
+
   for (const cartao of cartoes) {
     for (const i of cartao.fatura) {
-      linhas.push(`${libLocal.formatData(i.data, 'mes-dia')} R$ ${libLocal.formatReal(i.valor)} ${i.total_parcelas > 1 ? ` ${i.parcela}/${i.total_parcelas}` : ''} - ${i.descritivo}`);
+      const dataEvento = new Date(i.data);
+
+      dataEvento.setHours(0);
+      dataEvento.setMinutes(0);
+      dataEvento.setSeconds(0);
+
+      const status = data.getTime() > dataEvento.getTime()
+        ? '✅'
+        : '🗓'
+
+      const parcelas = i.total_parcelas > 1
+        ? ` ${i.parcela}/${i.total_parcelas}`
+        : null;
+
+      const tags = mostrarTags && i.tags && i.tags.length > 0
+        ? i.tags.map(t => `[${t}]`).join(' ')
+        : null;
+
+      const descricao = mostrarDescricao || !tags
+        ? i.descritivo
+        : null;
+
+      linhas.push(`<pre>${status} ${libLocal.formatData(i.data, 'mes-dia')} R$ ${libLocal.formatReal(i.valor)}${parcelas || ''} ${tags || '-'} ${descricao || ''}</pre>`);
     }
 
     total += cartao.total;
