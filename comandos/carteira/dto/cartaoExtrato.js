@@ -29,7 +29,15 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) 
         parcelado += !ehRecorrente && i.data().total_parcelas > 1 ? parseInt(i.data().valor) : 0;
         avista += !ehRecorrente && i.data().total_parcelas === 1 ? parseInt(i.data().valor) : 0;
 
-        fatura.push({...i.data(), id: i.id});
+        fatura.push({
+          ...i.data(),
+          id: i.id,
+          tipo: ehRecorrente
+            ? 'recorrente'
+            : i.data().total_parcelas > 1
+              ? 'parcelado'
+              : 'avista'
+        });
       }
 
       cartoes.push({
