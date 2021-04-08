@@ -30,7 +30,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       dataEvento.setMinutes(0);
       dataEvento.setSeconds(0);
 
-      const status = data.getTime() > dataEvento.getTime()
+      const status = i.tipo === 'recorrente' && data.getTime() > dataEvento.getTime()
         ? '✅'
         : '🗓'
 
@@ -56,7 +56,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     }
 
     total += cartao.total;
-    cartao.fatura.length > 0 && linhas.push(`🧮 ${cartao.nome} R$ ${libLocal.formatReal(cartao.total)}`);
+    cartao.fatura.length > 0 && linhas.push(`🧮 ${cartao.nome.toUpperCase()} R$ ${libLocal.formatReal(cartao.total)}`);
     cartao.fatura.length > 0 && linhas.push('');
   }
 
