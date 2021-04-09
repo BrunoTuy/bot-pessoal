@@ -5,14 +5,17 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (!parametros || parametros.length < 5) {
     callback([
       'Exemplo do comando abaixo',
-      `${subComando} {data} {cartao} {parcelas 4} {valor em centavos} {descritivo}`,
+      `${subComando} {data} {cartao} {parcelas 4} {valor em centavos} {descritivo} / {tag um, tag dois}`,
     ]);
   } else {
     const data = libLocal.entenderData(parametros.shift());
     const cartao = parametros.shift();
     const parcelas = parametros.shift();
     const valor = parametros.shift();
-    const descritivo = parametros.join(' ');
+    const parametrosFinal = parametros.join(' ').split('/');
+    const descritivo = parametrosFinal.shift();
+    const tags = parametrosFinal.shift();
+    const tagsArray = (tags || '').split(',');
     const { db } = lib.firebase;
 
     if (parcelas > 12) {
@@ -46,7 +49,8 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
                 descritivo,
                 parcela,
                 parcelas,
-                competencia
+                competencia,
+                tags: (tagsArray || []).filter(t => t && t.trim().length > 0).map(t => t.trim())
               }
             });
 
