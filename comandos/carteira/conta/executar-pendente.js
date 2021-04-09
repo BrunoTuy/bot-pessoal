@@ -1,23 +1,12 @@
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const { db } = lib.firebase;
 
-  if (parametros.length === 4) {
+  if (parametros.length === 2) {
     const contaId = parametros.shift();
     const extratoId = parametros.shift();
-    const data = libLocal.entenderData(parametros.shift());
-    const strValor = parametros.shift().toString();
-
-    const valor = strValor.substring(strValor.length-1) === 'c'
-      ? strValor.substring(0, strValor.length-1)
-      : strValor*-1;
 
     const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(extratoId);
-    docRef.update({
-      valor,
-      status: 'feito',
-      dataTexto: data,
-      data: data.getTime()
-    });
+    docRef.update({ status: 'feito' });
 
     callback('Registro atualizado')
   } else {
@@ -37,7 +26,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         .orderBy('data')
         .get();
 
-      extrato.size > 0 && linhas.push(`-- ${conta.data().banco} ${conta.id}`);
+      extrato.size > 0 && linhas.push(`${conta.data().banco.toUpperCase()}`);
 
       for (const i of extrato.docs) {
         const { data, status, valor, descritivo } = i.data();
@@ -45,13 +34,13 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
           ? 'PF'
           : 'PC'
 
-        linhas.push(`${i.id} ${libLocal.formatData(data)} ${formatStatus} R$${libLocal.formatReal(valor)} ${descritivo}`);
+        linhas.push(`<pre>${conta.id} ${i.id} ${libLocal.formatData(data)} ${formatStatus} R$${libLocal.formatReal(valor)} ${descritivo}</pre>`);
       }
 
       extrato.size > 0 && linhas.push('');
     }
 
-    linhas.push(`${subComando} {conta id} {movimento id} {dia|data} {valor}`);
+    linhas.push(`${subComando} {conta id} {movimento id}`);
 
     callback(linhas);
   }
