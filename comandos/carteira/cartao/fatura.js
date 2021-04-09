@@ -30,7 +30,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       dataEvento.setMinutes(0);
       dataEvento.setSeconds(0);
 
-      const status = i.tipo === 'recorrente' && data.getTime() > dataEvento.getTime()
+      const status = i.tipo !== 'recorrente' || data.getTime() > dataEvento.getTime()
         ? '✅'
         : '🗓'
 
