@@ -17,11 +17,8 @@ const exec = async ({ lib, params, callback }) => {
     `${cartao} ${retorno.id} $ ${valor/100} ${parcela ? `${parcela}/${parcelas}` : ''}`,
     `${recorrente ? recorrente.id : ''} ${descritivo}`,
     `${competencia} ${data}`,
-    '',
-    'Segue comando para inserir tags'
+    `${(tags || []).map(t => `[${t}]`).join(' ')}`
   ]);
-
-  callback && callback(`cd e ${cartao} ${retorno.id} tags + {tag nome}`);
 }
 
 module.exports = exec;

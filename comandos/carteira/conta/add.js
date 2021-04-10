@@ -17,9 +17,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
       const conta = parametrosObj ? parametrosObj.conta : parametros.shift();
       const strValor = (parametrosObj ? parametrosObj.valor : parametros.shift()).toString();
-      const descritivo = parametrosObj ? parametrosObj.descritivo : parametros.join(' ');
+      const parametrosFinal = parametros && parametros.join(' ').split('/');
+      const descritivo = parametrosObj ? parametrosObj.descritivo : parametrosFinal.shift();
       const recorrente = parametrosObj && parametrosObj.recorrente ? parametrosObj.recorrente : null;
-      const tags = parametrosObj && parametrosObj.tags ? parametrosObj.tags : [];
+      const tags = parametrosObj && parametrosObj.tags ? parametrosObj.tags : (parametrosFinal.shift() || '').split(',');
       const { db } = lib.firebase;
 
       const queryRef = db.collection('contas').where('banco', '==', conta);
@@ -50,7 +51,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           descritivo,
           status,
           recorrente,
-          tags
+          tags: tags.map(t => t.trim())
         });
 
         callback([
@@ -58,7 +59,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           `${conta}`,
           `Em ${data}`,
           `R$ ${valor/100}`,
-          `${(tags || []).map(t => `[${t}]`).join(' ')}`
+          `${(tags || []).map(t => `[${t.trim()}]`).join(' ')}`
         ]);
       }
     }
