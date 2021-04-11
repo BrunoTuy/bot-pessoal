@@ -13,12 +13,6 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const contas = await consultarPoupanca.exec({ anoMes, lib });
 
   for (const conta of contas) {
-    // for (const e of conta.extrato) {
-    //   const { valor, data } = e;
-
-    //   linhas.push(`<pre>${libLocal.formatData(data, 'mes-dia')} R$ ${libLocal.formatReal(valor*-1)}</pre>`);
-    // }
-
     total += conta.total;
     linhas.push(`<pre>${conta.banco.toUpperCase()} R$ ${libLocal.formatReal(conta.total)}</pre>`);
   }

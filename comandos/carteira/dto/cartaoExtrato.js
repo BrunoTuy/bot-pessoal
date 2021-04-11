@@ -1,4 +1,4 @@
-const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) => {
+const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, tags }) => {
   const { db } = lib.firebase;
   const cartoes = [];
   const cartoesCollection = await db.collection('cartoes').get();
@@ -10,12 +10,16 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib }) 
       let recorrente = 0;
       let avista = 0;
       const fatura = [];
-      const faturaCollection = dataMin && dataMax 
-        ? db.collection('cartoes').doc(cartao.id).collection('fatura')
-          .where('data', '>=', dataMin.getTime())
-          .where('data', '<=', dataMax.getTime())
-        : db.collection('cartoes').doc(cartao.id).collection('fatura')
-          .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
+      const dbCollection = db.collection('cartoes').doc(cartao.id).collection('fatura');
+      const faturaCollection = tags && tags.length > 0
+        ? dbCollection
+            .where('tags', 'array-contains-any', tags)
+        : dataMin && dataMax 
+          ? dbCollection
+              .where('data', '>=', dataMin.getTime())
+              .where('data', '<=', dataMax.getTime())
+          : dbCollection
+              .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
 
       const list = await faturaCollection
           .orderBy('data')

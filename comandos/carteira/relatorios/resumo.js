@@ -1,4 +1,4 @@
-const extrato = require('./dto/extrato.js');
+const extrato = require('../dto/extrato.js');
 
 const exec = async ({ parametros, callback, lib, libLocal }) => {
   let linhas = [];
@@ -39,6 +39,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 };
 
 module.exports = {
-  alias: ['status', 'st'],
+  alias: ['st'],
+  descricao: 'Status das contas',
   exec,
 }

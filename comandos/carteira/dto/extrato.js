@@ -1,4 +1,4 @@
-const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax }) => {
+const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags }) => {
   const lista = [];
   const totais = {
     feito: 0,
@@ -47,9 +47,15 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
     let feito = 0;
     let previsto = 0;
     const extratoLista = [];
-    const extrato = await db.collection('contas').doc(conta.id).collection('extrato')
-      .where('data', '>=', dataMin.getTime())
-      .where('data', '<=', dataMax.getTime())
+    const dbCollection = db.collection('contas').doc(conta.id).collection('extrato');
+    const extratoCollection = tags && tags.length > 0
+      ? dbCollection
+          .where('tags', 'array-contains-any', tags)
+      : dbCollection
+          .where('data', '>=', dataMin.getTime())
+          .where('data', '<=', dataMax.getTime());
+
+    const extrato = await extratoCollection
       .orderBy('data')
       .get();
 
