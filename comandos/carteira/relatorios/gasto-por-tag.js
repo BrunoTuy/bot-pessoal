@@ -15,7 +15,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     let total = 0;
 
     for (const c of contas.lista) {
-      c.extrato.length > 0 && linhas.push(`Conta ${c.banco.toUpperCase()}`)
+      c.extrato.length > 0 && linhas.push(`🏦 ${c.banco.toUpperCase()}`)
 
       for (const e of c.extrato) {
         const formatStatus = e.status === 'previsto fixo'
@@ -42,7 +42,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     }
 
     for (const cartao of cartoes) {
-      cartao.fatura.length > 0 && linhas.push(`Cartão ${cartao.nome.toUpperCase()}`);
+      cartao.fatura.length > 0 && linhas.push(`💳 ${cartao.nome.toUpperCase()}`);
 
       for (const i of cartao.fatura) {
         const parcelas = i.total_parcelas > 1
