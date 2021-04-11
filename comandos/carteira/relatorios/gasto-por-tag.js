@@ -71,10 +71,9 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
       cartao.fatura.length > 0 && linhas.push('');
     }
 
-    linhas.push('------ Geral ------');
-    linhas.push(`✅ Executado R$ ${libLocal.formatReal(contas.totais.feito)}`);
-    linhas.push(`🗓 Previsto R$ ${libLocal.formatReal(contas.totais.previsto)}`);
-    linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
+    linhas.push(`🏦 Contas R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
+    linhas.push(`💳 Cartões R$ ${libLocal.formatReal(total)}`);
+    linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto+total)}`);
   }
 
   callback(linhas);  
