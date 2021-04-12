@@ -23,6 +23,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   data.setSeconds(0);
 
   for (const cartao of cartoes) {
+    cartao.fatura.length > 0 && linhas.push(`💳 ${cartao.nome.toUpperCase()}`);
     for (const i of cartao.fatura) {
       const dataEvento = new Date(i.data);
 
@@ -56,7 +57,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     }
 
     total += cartao.total;
-    cartao.fatura.length > 0 && linhas.push(`🧮 ${cartao.nome.toUpperCase()} R$ ${libLocal.formatReal(cartao.total)}`);
+    cartao.fatura.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(cartao.total)}`);
     cartao.fatura.length > 0 && linhas.push('');
   }
 

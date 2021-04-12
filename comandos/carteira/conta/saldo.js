@@ -13,7 +13,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const contas = await extrato.exec({ anoMes, lib });
 
   for (const c of contas.lista) {
-    linhas.push(`<pre>${c.banco.toUpperCase()} 🧮R$ ${libLocal.formatReal(c.previsto+c.feito)} (🗓R$${libLocal.formatReal(c.previsto)} ✅R$${libLocal.formatReal(c.feito)})</pre>`);
+    linhas.push(`<pre>🏦 ${c.banco.toUpperCase()} 🧮R$ ${libLocal.formatReal(c.previsto+c.feito)} (🗓R$${libLocal.formatReal(c.previsto)} ✅R$${libLocal.formatReal(c.feito)})</pre>`);
   }
 
   linhas.push('');

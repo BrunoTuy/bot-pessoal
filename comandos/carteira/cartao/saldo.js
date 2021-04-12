@@ -24,7 +24,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     totais.parcelado += cartao.parcelado;
     totais.recorrente += cartao.recorrente;
 
-    cartao.total > 0 && linhas.push(`<b>${cartao.nome.toUpperCase()}</b> 🗓 <pre>${competencia || cartao.competencia}</pre>`);
+    cartao.total > 0 && linhas.push(`<b>💳 ${cartao.nome.toUpperCase()}</b> 🗓 <pre>${competencia || cartao.competencia}</pre>`);
     cartao.avista > 0 && linhas.push(`<pre>1️⃣ R$ ${libLocal.formatReal(cartao.avista)}</pre> ${(cartao.avista/cartao.total*100).toPrecision(2)}%`);
     cartao.parcelado > 0 && linhas.push(`<pre>🔢 R$ ${libLocal.formatReal(cartao.parcelado)}</pre> ${(cartao.parcelado/cartao.total*100).toPrecision(2)}%`);
     cartao.recorrente > 0 && linhas.push(`<pre>🔁 R$ ${libLocal.formatReal(cartao.recorrente)}</pre> ${(cartao.recorrente/cartao.total*100).toPrecision(2)}%`);

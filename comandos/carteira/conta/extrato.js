@@ -16,7 +16,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const contas = await extrato.exec({ anoMes, lib, conta });
 
   for (const c of contas.lista) {
-    c.extrato.length > 0 && linhas.push(`-- Conta ${c.banco.toUpperCase()}`)
+    c.extrato.length > 0 && linhas.push(`🏦 ${c.banco.toUpperCase()}`)
 
     for (const e of c.extrato) {
       const formatStatus = e.status === 'previsto fixo'
