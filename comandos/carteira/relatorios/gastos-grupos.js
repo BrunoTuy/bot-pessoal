@@ -1,3 +1,6 @@
+const extrato = require('../dto/extrato.js');
+const fatura = require('../dto/cartaoExtrato.js');
+
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const linhas = [];
   const { db } = lib.firebase;
@@ -5,11 +8,14 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const dataMax = new Date();
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
-    : dataMin.getFullYear()*100+(dataMin.getMonth() > 10
+    : dataMin.getFullYear()*100+(dataMin.getMonth() > 11
       ? 101
-      : dataMin.getMonth()+2);
+      : dataMin.getMonth()+1);
 
   if (parametros.length < 1) {
+    const tagGrupo = {};
+    const grupos = {};
+    const tagsSemGrupo = [];
 
     dataMin.setFullYear(anoMes.toString().substring(0, 4))
     dataMin.setMonth(anoMes.toString().substring(4)-1, 1);
@@ -27,19 +33,77 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     dataMax.setMilliseconds(999);
     dataMax.setDate(dataMax.getDate()-1);
 
-    linhas.push('Ainda não funciona');
-    linhas.push(`anoMes ${anoMes}`);
-    linhas.push(`inicio ${dataMin}`);
-    linhas.push(`fim ${dataMax}`);
-    linhas.push('');
+    const contas = await extrato.exec({ dataMin, dataMax, lib });
+    const cartoes = await fatura.exec({ dataMin, dataMax, lib });
+    const gruposCol = await db.collection('grupos').get();
 
-    const grupos = await db.collection('grupos').get();
+    for (const g of gruposCol.docs) {
+      const { nome, tags } = g.data();
 
-    if (grupos.size < 1) {
-      linhas.push('Nenhum grupo cadastrado - Para realizar o cadastro use:')
-      linhas.push(`${subComando} ag {grupo nome}`);
+      grupos[nome] = {
+        tags,
+        contas: {
+          quantidade: 0,
+          valor: 0
+        },
+        cartao: {
+          quantidade: 0,
+          valor: 0
+        }
+      };
+
+      for (const tag of tags) {
+        tagGrupo[tag] = nome;
+      }
     }
 
+    for (const conta of contas.lista) {
+      for (const e of conta.extrato) {
+        if (!e.tags) {
+          continue;
+        }
+        for (const t of e.tags) {
+          const grupo = tagGrupo[t];
+
+          if (grupo) {
+            grupos[grupo].contas.quantidade++;
+            grupos[grupo].contas.valor += e.valor;
+          } else if (!tagsSemGrupo.includes(t)) {
+            tagsSemGrupo.push(t);
+          }
+        }
+      }
+    }
+
+    for (const cartao of cartoes) {
+      for (const f of cartao.fatura) {
+        if (!f.tags) {
+          continue;
+        }
+        let gruposCadastrados = [];
+        for (const t of f.tags) {
+          const grupo = tagGrupo[t];
+
+          if (grupo && !gruposCadastrados.includes(grupo)) {
+            gruposCadastrados.push(grupo);
+            grupos[grupo].cartao.quantidade++;
+            grupos[grupo].cartao.valor += f.valor;
+          } else if (!grupo && !tagsSemGrupo.includes(t)) {
+            tagsSemGrupo.push(t);
+          }
+        }
+      }
+    }
+
+    for (const [key, value] of Object.entries(grupos)) {
+      linhas.push(`<pre>${key} 🏦 ${value.contas.quantidade} R$ ${libLocal.formatReal(value.contas.valor*-1)} 💳 ${value.cartao.quantidade} R$ ${libLocal.formatReal(value.cartao.valor)} </pre>`);
+    }
+
+    tagsSemGrupo.length > 0 && linhas.push('');
+    tagsSemGrupo.length > 0 && linhas.push(`Existem ${tagsSemGrupo.length} tags sem grupo. Lista abaixo`);
+    for (const t of tagsSemGrupo) {
+      linhas.push(`<pre>${t}</pre>`);
+    }
   } else if (parametros[0] === '?') {
     linhas.push(`${subComando} - listar todos os gastos do mês atual`);
     linhas.push(`${subComando} {anoMes} - listar todos os gastos do ano e mês digitado`);
