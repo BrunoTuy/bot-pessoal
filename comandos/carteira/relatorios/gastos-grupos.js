@@ -62,13 +62,15 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         if (!e.tags) {
           continue;
         }
+        let gruposCadastrados = [];
         for (const t of e.tags) {
           const grupo = tagGrupo[t];
 
-          if (grupo) {
+          if (grupo && !gruposCadastrados.includes(grupo)) {
+            gruposCadastrados.push(grupo);
             grupos[grupo].contas.quantidade++;
             grupos[grupo].contas.valor += e.valor;
-          } else if (!tagsSemGrupo.includes(t)) {
+          } else if (!grupo && !tagsSemGrupo.includes(t)) {
             tagsSemGrupo.push(t);
           }
         }
