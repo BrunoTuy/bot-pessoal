@@ -25,7 +25,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     for (const c of cartoes) {
       for (const f of c.fatura) {
         faturasVazias = false;
-        linhas.push(`<pre>${c.id} ${f.id} R$ ${libLocal.formatReal(f.valor)} - ${c.nome} - ${f.descritivo}${f.tags ? ` ${f.tags.map(t => `[${t}]`).join(' ')}` : ''}</pre>`);
+        linhas.push(`<pre>${c.id} ${f.id} R$ ${libLocal.formatReal(f.valor)} - ${c.nome} - ${f.competencia} - ${f.descritivo}${f.tags ? ` ${f.tags.map(t => `[${t}]`).join(' ')}` : ''}</pre>`);
         linhas.push('');
       }
     }
@@ -36,6 +36,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
       linhas.push(`${subComando} {id cartão} {id fatura} data {data}`);
       linhas.push(`${subComando} {id cartão} {id fatura} valor {valor em centavos}`);
       linhas.push(`${subComando} {id cartão} {id fatura} tags {+|-} {nome da tag}`);
+      linhas.push(`${subComando} {id cartão} {id fatura} competencia {competencia}`);
       linhas.push(`${subComando} {id cartão} {id fatura} descritivo {descritivo}`);
     }
 
@@ -56,6 +57,18 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
       objSet.dataTexto = dataSet;
     } else if (tipoDado === 'valor') {
       objSet.valor = parseInt(dado);
+    } else if (tipoDado === 'competencia') {
+      const ano = dado.toString().substring(0, 4);
+      const mes = dado.toString().substring(4, 6);
+
+      if (dado.length != 6 || ano < 2021 || mes < 1 || mes > 12) {
+        callback([
+          `Competência ${dado} inválida`,
+          'exemplo 202104'
+        ]);
+      } else {
+        objSet.competencia = parseInt(dado);
+      }
     } else if (tipoDado === 'descritivo') {
       objSet.descritivo = dado;
     } else if (tipoDado === 'tags') {
