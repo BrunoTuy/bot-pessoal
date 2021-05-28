@@ -41,7 +41,7 @@ module.exports = {
       }
     } catch (e) {
       console.log('--- 3rr0r', e);
-      callback('Erro na execução');
+      callback('🐞 Erro na execução');
     }
   }
 };
