@@ -16,7 +16,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       callback,
       libLocal,
       subComando,
-      parametros: [data, 'inter', 1, valor, descritivo]
+      parametros: ['inter', 1, data, valor, descritivo]
     });
   }
 }

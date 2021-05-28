@@ -2,7 +2,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
   if ((!parametros || parametros.length < 4) && !parametrosObj) {
     callback([
       'Exemplo do comando abaixo',
-      `${subComando} {data} {conta} {valor em centavos} {descritivo}`,
+      `${subComando} {conta} {data} {valor em centavos} {descritivo}`,
     ]);
   } else {
     if (parametrosObj && (
@@ -14,13 +14,11 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       callback(`Tem algo errado nos parametros para incluir compromisso na conta`);
     } else {
       const dataAgora = new Date();
-      const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
       const conta = parametrosObj ? parametrosObj.conta : parametros.shift();
-      const strValor = (parametrosObj ? parametrosObj.valor : parametros.shift()).toString();
-      const parametrosFinal = parametros && parametros.join(' ').split('/');
-      const descritivo = parametrosObj ? parametrosObj.descritivo : parametrosFinal.shift();
+      const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
+      const valor = libLocal.entenderValor({ val: parametros.shift() });
+      const { descritivo, tags } = parametros && libLocal.entenderDescritivoTags(parametros.join(" "));
       const recorrente = parametrosObj && parametrosObj.recorrente ? parametrosObj.recorrente : null;
-      const tags = parametrosObj && parametrosObj.tags ? parametrosObj.tags : (parametrosFinal.shift() || '').split(',');
       const { db } = lib.firebase;
 
       const queryRef = db.collection('contas').where('banco', '==', conta);
@@ -30,10 +28,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
         callback('Conta não cadastrada.');
       } else {
         const contaDoc = contasGet.docs[0];
-        const valor = strValor.substring(strValor.length-1) === 'c'
-          ? strValor.substring(0, strValor.length-1)
-          : strValor*-1;
-
         const status = parametrosObj && parametrosObj.status
           ? parametrosObj.status
           : (dataAgora.getFullYear() > data.getFullYear()
@@ -51,7 +45,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           descritivo,
           status,
           recorrente,
-          tags: tags.map(t => t.trim())
+          tags
         });
 
         callback([

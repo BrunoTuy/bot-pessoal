@@ -16,7 +16,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       callback,
       libLocal,
       subComando,
-      parametros: [data, 'nubank', 1, valor, descritivo]
+      parametros: ['nubank', 1, data, valor, descritivo]
     });
   }
 }
