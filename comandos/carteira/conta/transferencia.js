@@ -9,7 +9,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   } else {
     const contaOrigem = parametros.shift();
     const contaDestino = parametros.shift();
-    const data = libLocal.entenderData(parametros.shift());
+    const data = parametros.shift();
     const valor = parseInt(parametros.shift());
     const contasId = {
       origem: null,
@@ -36,26 +36,14 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         lib,
         libLocal,
         callback,
-        parametrosObj: {
-          tags: ["transf BMT"],
-          data,
-          valor,
-          conta: contaOrigem,
-          descritivo: `Transferência para ${contaDestino}`
-        }
+        parametros: [contaOrigem, data, valor, `Transferência para ${contaDestino} / transf BMT`]
       });
 
       contaAdd.exec({
         lib,
         libLocal,
         callback,
-        parametrosObj: {
-          tags: ["transf BMT"],
-          data,
-          valor: valor*-1,
-          conta: contaDestino,
-          descritivo: `Transferência de ${contaOrigem}`
-        }
+        parametros: [contaDestino, data, `${valor}c`, `Transferência de ${contaOrigem} / transf BMT`]
       });
     }
   }
