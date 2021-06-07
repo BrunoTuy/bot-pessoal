@@ -38,7 +38,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
 
         const obj = await db.collection('contas').doc(contaDoc.id).collection('extrato');
 
-        obj && obj.add({
+        const retorno = await obj.add({
           data: data.getTime(),
           dataTexto: data,
           valor: parseInt(valor),
@@ -49,11 +49,11 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
         });
 
         callback([
-          `Cadastrado ${descritivo}`,
-          `${conta}`,
+          `${conta} - ${descritivo}`,
           `Em ${data}`,
           `R$ ${valor/100}`,
-          `${(tags || []).map(t => `[${t.trim()}]`).join(' ')}`
+          `${(tags || []).map(t => `[${t.trim()}]`).join(' ')}`,
+          `✅ Inserido ${contaDoc.id} ${retorno.id}`
         ]);
       }
     }
