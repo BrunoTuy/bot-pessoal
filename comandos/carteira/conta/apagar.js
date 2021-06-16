@@ -48,16 +48,17 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     if (doc.data()) {
       const { data, valor, descritivo, recorrente, tags } = doc.data();
 
-      await docRef.delete();
-
       callback([
         `Conta ${contaId} Movimento ${movimentoId}`,
         `Data ${libLocal.formatData(data)}`,
         `Descritivo ${descritivo} ${tags ? ` ${tags.map(t => `[${t}]`).join(' ')}` : ''}`,
-        `RS ${libLocal.formatReal(valor)}`,
+        `R$ ${libLocal.formatReal(valor)}`,
         `Recorrente ${recorrente ? 'Sim' : 'Não'}`,
-        '✅ Removido'
       ]);
+
+      await docRef.delete();
+
+      callback('✅ Removido');
     } else {
       callback('Registro não encontrado');
     }
