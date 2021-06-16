@@ -16,8 +16,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       const dataAgora = new Date();
       const conta = parametrosObj ? parametrosObj.conta : parametros.shift();
       const data = parametrosObj ? parametrosObj.data : libLocal.entenderData(parametros.shift());
-      const valor = libLocal.entenderValor({ val: parametros.shift() });
-      const { descritivo, tags } = parametros && libLocal.entenderDescritivoTags(parametros.join(" "));
+      const valor = parametrosObj ? parametrosObj.valor : libLocal.entenderValor({ val: parametros.shift() });
+      const { descritivo, tags } = parametrosObj && parametrosObj.descritivo
+        ? libLocal.entenderDescritivoTags(parametrosObj.descritivo)
+        : parametros &&libLocal.entenderDescritivoTags(parametros.join(" "));
       const recorrente = parametrosObj && parametrosObj.recorrente ? parametrosObj.recorrente : null;
       const { db } = lib.firebase;
 

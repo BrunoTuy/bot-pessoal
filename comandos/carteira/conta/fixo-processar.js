@@ -54,14 +54,13 @@ const correrLista = async ({ lista, insert, ano, mes, db }) => {
 
           insert({
             tags,
-            valor,
-            descritivo,
+            valor: valor*-1,
             data: dataA,
             contador: idx,
-            nome: item.banco,
             itemId: item.id,
             recorrente: rec,
-            competencia: item.competencia
+            nome: item.banco,
+            descritivo: `${descritivo}/recorrente,${(tags || []).join(',')}`
           });
 
           contador++;
