@@ -23,7 +23,7 @@ const entenderData = entrada => {
       dia = entrada.substring(6, 8);
     }
 
-    if (ano && mes && dia && ano > 2020
+    if (ano && mes && dia && ano > 2019
       && mes > 0 && mes < 13
       && dia > 0 && dia < 32)
     {
