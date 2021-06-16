@@ -5,8 +5,30 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     ? parametros.shift()
     : null;
   const linhas = [];
+  const dataMin = anoMes ? new Date() : null;
+  const dataMax = anoMes ? new Date() : null;
 
-  const extratoExecutado = await extrato.exec({ lib });
+  if (anoMes) {
+    const ano = anoMes.toString().substr(0, 4);
+    const mes = anoMes.toString().substr(4)-1;
+
+    dataMin.setFullYear(ano);
+    dataMin.setMonth(mes, 1);
+    dataMin.setHours(0);
+    dataMin.setMinutes(0);
+    dataMin.setSeconds(0);
+    dataMin.setMilliseconds(0);
+
+    dataMax.setFullYear(ano);
+    dataMax.setMonth(mes+1, 1);
+    dataMax.setHours(23);
+    dataMax.setMinutes(59);
+    dataMax.setSeconds(59);
+    dataMax.setMilliseconds(999);
+    dataMax.setDate(dataMax.getDate()-1);
+  }
+
+  const extratoExecutado = await extrato.exec({ dataMin, dataMax, lib });
 
   for (const e of extratoExecutado.lista) {
       const tags = e.tags && e.tags.length > 0
