@@ -15,7 +15,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
 
       const descricao = e.descritivo;
 
-      linhas.push(`<pre>${libLocal.formatData(e.data, 'dia')} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
+      linhas.push(`<pre>${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
   }
 
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(extratoExecutado.total)}`);
