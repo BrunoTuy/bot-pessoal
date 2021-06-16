@@ -1,5 +1,6 @@
 const extrato = require('../dto/extrato.js');
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
+const dinheiroExtrato = require('../dto/dinheiroExtrato.js');
 
 const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
   const linhas = [];
@@ -12,6 +13,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     const mostrarDescricao = true;
     const contas = await extrato.exec({ lib, tags });
     const cartoes = await cartaoExtrato.exec({ lib, tags });
+    const extratoExecutado = await dinheiroExtrato.exec({ lib, tags });
     let total = 0;
 
     for (const c of contas.lista) {
@@ -71,9 +73,23 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
       cartao.fatura.length > 0 && linhas.push('');
     }
 
+    for (const e of extratoExecutado.lista) {
+      const tags = e.tags && e.tags.length > 0
+        ? e.tags.map(t => `[${t}]`).join(' ')
+        : null;
+
+      const descricao = e.descritivo;
+
+      linhas.push(`<pre>💸 ${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
+    }
+
+    extratoExecutado.lista.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(extratoExecutado.total)}`);
+    extratoExecutado.lista.length > 0 && linhas.push('');
+
     linhas.push(`🏦 Contas R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
     linhas.push(`💳 Cartões R$ ${libLocal.formatReal(-total)}`);
-    linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto-total)}`);
+    linhas.push(`💸 Dinheiro R$ ${libLocal.formatReal(extratoExecutado.total)}`);
+    linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto-total+extratoExecutado.total)}`);
   }
 
   callback(linhas);  
