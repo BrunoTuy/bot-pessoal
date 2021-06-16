@@ -73,6 +73,8 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
       cartao.fatura.length > 0 && linhas.push('');
     }
 
+    extratoExecutado.lista.length > 0 && linhas.push('💸 na mão');
+
     for (const e of extratoExecutado.lista) {
       const tags = e.tags && e.tags.length > 0
         ? e.tags.map(t => `[${t}]`).join(' ')
@@ -80,7 +82,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
 
       const descricao = e.descritivo;
 
-      linhas.push(`<pre>💸 ${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
+      linhas.push(`<pre>${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
     }
 
     extratoExecutado.lista.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(extratoExecutado.total)}`);
