@@ -4,6 +4,8 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
     : null;
+  const mostrarTags = !(parametros.includes('-t'));
+  const mostrarDescricao = !(parametros.includes('-d'));
   const linhas = [];
   const dataMin = anoMes ? new Date() : null;
   const dataMax = anoMes ? new Date() : null;
@@ -31,11 +33,13 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const extratoExecutado = await extrato.exec({ dataMin, dataMax, lib });
 
   for (const e of extratoExecutado.lista) {
-      const tags = e.tags && e.tags.length > 0
+      const tags = mostrarTags && e.tags && e.tags.length > 0
         ? e.tags.map(t => `[${t}]`).join(' ')
         : null;
 
-      const descricao = e.descritivo;
+      const descricao = mostrarDescricao
+        ? e.descritivo
+        : null;
 
       linhas.push(`<pre>${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
   }

@@ -8,9 +8,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     : data.getFullYear()*100+(data.getMonth() > 10
       ? 101
       : data.getMonth()+2);
-  const cartao = !['t', 'd'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
-  const mostrarTags = (parametros.shift() || '').toLowerCase() === 't';
-  const mostrarDescricao = (parametros.shift() || '').toLowerCase() === 'd';
+  const cartao = !['-t', '-d'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
+  const mostrarTags = !(parametros.includes('-t'));
+  const mostrarDescricao = !(parametros.includes('-d'));
   const linhas = [];
   let total = 0;
 
@@ -43,7 +43,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         ? i.tags.map(t => `[${t}]`).join(' ')
         : null;
 
-      const descricao = mostrarDescricao || !tags
+      const descricao = mostrarDescricao
         ? i.descritivo
         : null;
 

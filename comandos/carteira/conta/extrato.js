@@ -4,9 +4,9 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
     : null;
-  const conta = !['t', 'd'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
-  const mostrarTags = (parametros.shift() || '').toLowerCase() === 't';
-  const mostrarDescricao = (parametros.shift() || '').toLowerCase() === 'd';
+  const conta = !['-t', '-d'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
+  const mostrarTags = !(parametros.includes('-t'));
+  const mostrarDescricao = !(parametros.includes('-d'));
   const linhas = [];
   const totais = {
     feito: 0,
@@ -31,7 +31,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
         ? e.tags.map(t => `[${t}]`).join(' ')
         : null;
 
-      const descricao = mostrarDescricao || !tags
+      const descricao = mostrarDescricao
         ? e.descritivo
         : null;
 
