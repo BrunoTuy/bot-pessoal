@@ -1,4 +1,4 @@
-const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags }) => {
+const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal }) => {
   const lista = [];
   const totais = {
     feito: 0,
@@ -8,7 +8,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
   const dataMin = paramDataMin || new Date();
   const dataMax = paramDataMax || new Date();
 
-  if (!paramDataMin) {
+  if (!paramDataMin && !dataTotal) {
     if (anoMes) {
       dataMin.setFullYear(anoMes.toString().substring(0, 4))
       dataMin.setMonth(anoMes.toString().substring(4)-1, 1);
@@ -21,7 +21,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
     dataMin.setMilliseconds(0);
   }
 
-  if (!paramDataMax) {
+  if (!paramDataMax && !dataTotal) {
     if (anoMes) {
       dataMax.setFullYear(anoMes.toString().substring(0, 4))
       dataMax.setMonth(anoMes.toString().substring(4), 1);
@@ -51,9 +51,11 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
     const extratoCollection = tags && tags.length > 0
       ? dbCollection
           .where('tags', 'array-contains-any', tags)
-      : dbCollection
-          .where('data', '>=', dataMin.getTime())
-          .where('data', '<=', dataMax.getTime());
+      : dataTotal 
+        ? dbCollection
+        : dbCollection
+            .where('data', '>=', dataMin.getTime())
+            .where('data', '<=', dataMax.getTime());
 
     const extrato = await extratoCollection
       .orderBy('data')

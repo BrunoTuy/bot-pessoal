@@ -1,4 +1,4 @@
-const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, tags }) => {
+const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, tags, dataTotal }) => {
   const { db } = lib.firebase;
   const cartoes = [];
   const cartoesCollection = await db.collection('cartoes').get();
@@ -18,8 +18,10 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, ta
           ? dbCollection
               .where('data', '>=', dataMin.getTime())
               .where('data', '<=', dataMax.getTime())
-          : dbCollection
-              .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
+          : dataTotal
+            ? dbCollection
+            : dbCollection
+                .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
 
       const list = await faturaCollection
           .orderBy('data')

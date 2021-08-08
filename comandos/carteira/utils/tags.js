@@ -11,7 +11,7 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
     const tags = {};
     callback('Atualizando lista, aguarde!');
 
-    const contas = await extrato.exec({ lib });
+    const contas = await extrato.exec({ lib, dataTotal: true });
     contas.lista.forEach(c =>
       c.extrato.forEach(e => 
         e.tags && e.tags.forEach(t => {
@@ -28,7 +28,7 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
       )
     );
 
-    const cartoes = await fatura.exec({ lib });
+    const cartoes = await fatura.exec({ lib, dataTotal: true });
     cartoes.forEach(c =>
       c.fatura.forEach(f =>
         f.tags && f.tags.forEach(t => {
