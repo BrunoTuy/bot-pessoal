@@ -15,15 +15,17 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
     contas.lista.forEach(c =>
       c.extrato.forEach(e => 
         e.tags && e.tags.forEach(t => {
-          if (!tags[t]) {
-            tags[t] = {
-              cc: 0,
-              cd: 0,
-              dm: 0
+          if (t.length > 0) {
+            if (!tags[t]) {
+              tags[t] = {
+                cc: 0,
+                cd: 0,
+                dm: 0
+              }
             }
-          }
 
-          tags[t].cc++;
+            tags[t].cc++;
+          }
         })
       )
     );
@@ -32,7 +34,26 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
     cartoes.forEach(c =>
       c.fatura.forEach(f =>
         f.tags && f.tags.forEach(t => {
-          if (!tags[t]) {
+          if (t.length > 0) {
+            if (!tags[t]) {
+              tags[t] = {
+                cc: 0,
+                cd: 0,
+                dm: 0
+              }
+            }
+
+            tags[t].cd++;
+          }
+        })
+      )
+    );
+
+    const extratoExecutado = await dinheiroExtrato.exec({ lib });
+    extratoExecutado.lista.forEach(e =>
+      e.tags && e.tags.forEach(t => {
+          if (t.length > 0) {
+            if (!tags[t]) {
             tags[t] = {
               cc: 0,
               cd: 0,
@@ -40,24 +61,8 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
             }
           }
 
-          tags[t].cd++;
-        })
-      )
-    );
-
-
-    const extratoExecutado = await dinheiroExtrato.exec({ lib });
-    extratoExecutado.lista.forEach(e =>
-      e.tags && e.tags.forEach(t => {
-        if (!tags[t]) {
-          tags[t] = {
-            cc: 0,
-            cd: 0,
-            dm: 0
-          }
+          tags[t].dm++;
         }
-
-        tags[t].dm++;
       })
     );
 
