@@ -17,7 +17,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     let total = 0;
 
     for (const c of contas.lista) {
-      c.extrato.length > 0 && linhas.push(`🏦 ${c.banco.toUpperCase()}`)
+      c.extrato.length > 0 && linhas.push(`🏦 ${c.banco.toUpperCase()} :${c.id}:`)
 
       for (const e of c.extrato) {
         const formatStatus = e.status === 'previsto fixo'
@@ -36,7 +36,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
           ? e.descritivo
           : null;
 
-        linhas.push(`<pre>${formatStatus} ${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
+        linhas.push(`<pre>${formatStatus} ${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''} :${e.id}:</pre>`);
       }
 
       c.extrato.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(c.previsto+c.feito)} (🗓R$${libLocal.formatReal(c.previsto)} ✅R$${libLocal.formatReal(c.feito)})`);
@@ -44,7 +44,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     }
 
     for (const cartao of cartoes) {
-      cartao.fatura.length > 0 && linhas.push(`💳 ${cartao.nome.toUpperCase()}`);
+      cartao.fatura.length > 0 && linhas.push(`💳 ${cartao.nome.toUpperCase()} :${cartao.id}:`);
 
       for (const i of cartao.fatura) {
         const parcelas = i.total_parcelas > 1
@@ -65,7 +65,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
             ? '🔢'
             : '1️⃣';
 
-        linhas.push(`<pre>${tipo} ${libLocal.formatData(i.data)} R$ ${libLocal.formatReal(i.valor)}${parcelas || ''} ${tags || '-'} ${descricao || ''}</pre>`);
+        linhas.push(`<pre>${tipo} ${libLocal.formatData(i.data)} R$ ${libLocal.formatReal(i.valor)}${parcelas || ''} ${tags || '-'} ${descricao || ''} :${i.id}:</pre>`);
       }
 
       total += cartao.total;
@@ -82,7 +82,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
 
       const descricao = e.descritivo;
 
-      linhas.push(`<pre>${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
+      linhas.push(`<pre>${libLocal.formatData(e.data)} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''} :${e.id}:</pre>`);
     }
 
     extratoExecutado.lista.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(extratoExecutado.total)}`);

@@ -5,10 +5,10 @@ const comandos = [];
 
 fs
   .readdirSync(__dirname)
-  .filter( ( file )  => (file.indexOf(".") !== 0) && !['index.js', 'lib', 'dto'].includes(file) )
+  .filter( ( file )  => file.indexOf(".") !== 0 && file.indexOf("_") !== 0 && !['index.js', 'lib', 'dto'].includes(file) )
   .forEach( ( file ) => {
-    const obj = require(path.join(__dirname, file));
     const name = file.includes('.js') ? file.substring( 0, file.length-3 ) : file;
+    const obj = require(path.join(__dirname, file));
 
     if ( obj.alias ) {
       obj.alias.forEach( alias => list[alias] = obj );
@@ -24,7 +24,8 @@ fs
   });
 
 module.exports = {
-  alias: ['ut'],
+  alias: ['fp'],
+  descricao: 'Financiamento pessoal',
   context: true,
   exec: async ({ subComando, callback, comando, contexto, parametros, original, lib, libLocal }) => {
     const subSubComando = parametros && parametros.length > 0
