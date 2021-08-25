@@ -1,4 +1,5 @@
 const extrato = require('../dto/extrato.js');
+const editar = require('../dto/contaEditar.js');
 
 const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
   if (parametros.length === 1) {
@@ -86,7 +87,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     }
 
     if (objSet !== {}) {
-      docRef.update(objSet);
+      await editar({ lib, contaId, extratoId, data: objSet });
       callback('Registro atualizado com sucesso.');
     }
   } else {
@@ -99,6 +100,6 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 
 module.exports = {
   alias: ['e'],
-  descricao: 'Editar recorrente',
+  descricao: 'Editar movimento',
   exec,
 }

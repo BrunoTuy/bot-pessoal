@@ -1,3 +1,5 @@
+const editar = require('../dto/contaEditar.js');
+
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const { db } = lib.firebase;
 
@@ -5,8 +7,12 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     const contaId = parametros.shift();
     const extratoId = parametros.shift();
 
-    const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(extratoId);
-    docRef.update({ status: 'feito' });
+    await editar({
+      lib,
+      contaId,
+      extratoId,
+      data: { status: 'feito' }
+    });
 
     callback('Registro atualizado')
   } else {
