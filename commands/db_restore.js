@@ -35,7 +35,7 @@ const exec = ({ bot, callback, original }) => {
 }
 
 module.exports = {
-  ocultar: true,
+  hidden: true,
   restricted: true,
   context: true,
   exec

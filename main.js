@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const port = process.env.PORT || 5000;
 const TOKEN = process.env.TOKEN_TELEGRAM;
-const comandos = require( './comandos' );
+const commandList = require( './commands' );
 const firebase = require('./lib/firebase.js');
 
 const bot = new TelegramBot( TOKEN, { polling: process.env.NODE_ENV !== 'production' } );
@@ -25,24 +25,23 @@ bot.on( 'message', async ( msg ) => {
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
 
   const allowed = (process.env.CHAT_ALLOWED || '').split(',').includes(msg.chat.id.toString());
-  const cmds = {};
+  const commands = {};
 
-  for ( key in comandos ) {
-    if ( allowed || !comandos[key].restricted )
-    {
-      cmds[key] = comandos[key];
+  Object.entries(commandList).forEach(i => {
+    if (allowed || !i[1].restricted) {
+      commands[i[0]] = i[1];
     }
-  }
+  })
 
   const { ultimoComando, contexto } = await banco.getChatData(msg.chat.id);
   const parametros = msg.text ? msg.text.split( ' ' ) : [''];
   const comando = parametros[0].indexOf('/') === 0
     ? parametros.shift().substring( 1 ).split( '@' )[0].toLowerCase()
-    : ultimoComando && cmds[ultimoComando] && cmds[ultimoComando].context
+    : ultimoComando && commands[ultimoComando] && commands[ultimoComando].context
       ? ultimoComando
       : false;
 
-  if ( !comando || typeof cmds[comando] === 'undefined' || cmds[comando].exec  === 'undefined' )
+  if ( !comando || typeof commands[comando] === 'undefined' || commands[comando].exec  === 'undefined' )
   {
     const resposta = [
       `Oi ${msg.from.first_name}`,
@@ -51,8 +50,8 @@ bot.on( 'message', async ( msg ) => {
       'Tente:'
     ];
 
-    for ( key in cmds ) {
-      if ( cmds[key] && !cmds[key].ocultar )
+    for ( key in commands ) {
+      if ( commands[key] && !commands[key].hidden )
       {
         resposta.push(`/${key}`);
       }
@@ -61,10 +60,10 @@ bot.on( 'message', async ( msg ) => {
     enviar( msg.chat.id, resposta.join('\n') );
   }
 
-  if ( comando && cmds[comando] && cmds[comando].exec ) {
-    cmds[comando].exec({
+  if ( comando && commands[comando] && commands[comando].exec ) {
+    commands[comando].exec({
       bot,
-      cmds,
+      cmds: commands,
       comando,
       contexto,
       parametros,

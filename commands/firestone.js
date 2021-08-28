@@ -98,7 +98,7 @@ const exec = async ({ comando, callback, lib, original }) => {
 }
 
 module.exports = {
-  ocultar: true,
+  hidden: true,
   restricted: true,
   exec
 };

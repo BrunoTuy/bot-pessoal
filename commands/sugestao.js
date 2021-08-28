@@ -1,18 +1,18 @@
-const executarComando = ({ parametros, callback, config, bot, original }) => {
+const exec = ({ parametros, callback, config, bot, original }) => {
   if ( parametros.length === 0 ) {
     callback([
       'Para o envio de sugestoes coloque sua mensagem logo apos o comando',
       '',
       'Exemplo:',
-      '/sugestao Melhore a funcionalidade xpto...'
-    ].join('\n'));
+      '<pre>/sugestao Melhore a funcionalidade xpto...</pre>'
+    ]);
   }
 
   else {
     callback([
       'Muito obrigado.',
       'A sugestão enviada com sucesso!'
-    ].join('\n'));
+    ]);
 
     const momento = new Date( original.date*1000 );
     const dadosChat = `${original.chat.type} ${(original.chat.title || original.chat.id)}`;
@@ -22,4 +22,4 @@ const executarComando = ({ parametros, callback, config, bot, original }) => {
   }
 };
 
-module.exports = { exec: executarComando };
+module.exports = { exec };

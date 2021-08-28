@@ -1,4 +1,4 @@
 module.exports = {
-  exec: async ({ bot, callback, original }) =>
+  exec: async ({ callback }) =>
     callback(' ~~ Pong ~~ ')
 };

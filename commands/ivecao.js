@@ -70,7 +70,7 @@ const importar = async ( linha, callback ) => {
 
 module.exports = {
   restricted: true,
-  ocultar: true,
+  hidden: true,
   context: true,
   exec: async ({ callback, banco, comando, contexto, parametros, original }) => {
     console.log('--- comando recebido', parametros);

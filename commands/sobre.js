@@ -5,5 +5,5 @@ module.exports = {
     'Desenvolvido em nodeJS',
     '',
     'Fontes https://github.com/BrunoTuy/bot-pessoal'
-  ].join('\n') )
+  ] )
 };
