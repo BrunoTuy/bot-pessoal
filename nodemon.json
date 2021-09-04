@@ -1,4 +1,4 @@
 {
-  "watch": ["main.js", "lib/", "comandos/"],
+  "watch": ["main.js", "lib/", "commands/", ".env"],
   "ext": "js"
 }

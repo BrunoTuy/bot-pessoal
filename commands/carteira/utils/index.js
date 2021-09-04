@@ -5,6 +5,8 @@ module.exports = getStruct({
   alias: ['ut'],
   hasContext: true,
   restricted: false,
-  description: 'Utils'
+  description: 'Utils',
+  commandWhenEmpty: 'st',
+  commandsShowList: ['st']
 });
 
