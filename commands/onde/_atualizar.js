@@ -8,17 +8,18 @@ const atualizar = async ({ lib, callback }) => {
 
   list.docs.forEach(async i => {
     const { id } = i;
-    const { lastUnixTime, xml } = i.data();
+    const docData = i.data();
+    const lastUnixTime = parseInt(docData.lastUnixTime || 0);
 
     if (lastUnixTime+290 > unixTimeNow) {
       return;
     }
 
-    const { data } = await axios.get(xml);
+    const { data } = await axios.get(docData.xml);
     const { response } = xmlParser.toJson(data, { object: true });
     const coll = await db.collection('findme').doc(id).collection('historico');
     const messages = response.feedMessageResponse.messages.message
-      .filter(m => m.unixTime > (lastUnixTime || 0));
+      .filter(m => parseInt(m.unixTime) > (lastUnixTime || 0));
 
     messages.forEach(async m => {
       const date = new Date(m.dateTime);
@@ -48,7 +49,7 @@ const atualizar = async ({ lib, callback }) => {
     await db.collection('findme').doc(id).update({
       status,
       battery,
-      lastUnixTime: unixTime,
+      lastUnixTime: parseInt(unixTime),
       updateAt: updateAt.toJSON(),
       latitude,
       longitude,
