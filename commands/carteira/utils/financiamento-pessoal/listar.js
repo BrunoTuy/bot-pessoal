@@ -13,7 +13,7 @@ const exec = async ({ callback, lib, libLocal }) => {
     let creditoPendente = 0;
 
     creditos.forEach(({ valor, conta, status }) => {
-      if (i.conta === 'dm' || i.status === 'feito') {
+      if (conta === 'dm' || status === 'feito') {
         creditoFeito += numeroPositivo(valor);
       } else {
         creditoPendente += numeroPositivo(valor);
