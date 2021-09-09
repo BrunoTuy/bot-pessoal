@@ -30,7 +30,7 @@ const exec = async ({ callback, lib, libLocal }) => {
 
     total += saldo;
 
-    linhas.push(`${status} ${descritivo} | D${debitos.length}$${libLocal.formatReal(debitosTotal)} | C${creditos.length}$${libLocal.formatReal(creditosTotal)} | S ${libLocal.formatReal(saldo)}`);
+    linhas.push(`${status} ${descritivo} | D ${debitos.length} C ${creditos.length} Saldo ${libLocal.formatReal(saldo)}`);
   });
 
   linhas.push('');
