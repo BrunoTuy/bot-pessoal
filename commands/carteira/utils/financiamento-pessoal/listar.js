@@ -8,11 +8,20 @@ const exec = async ({ callback, lib, libLocal }) => {
   list.docs.forEach(i => {
     const { descritivo, debitos = [], creditos = [] } = i.data();
     const debitosTotal = debitos.reduce((a, { valor }) => a + numeroPositivo(valor), 0);
-    const creditosTotal = creditos.reduce((a, { valor }) => a + numeroPositivo(valor), 0);
-    const saldo = -1 * debitosTotal + creditosTotal;
-    const creditoPendente = creditos.reduce((a, { valor, conta, status }) => a + (conta !== 'dm' || status !== 'feito' ? 0 : numeroPositivo(valor)) );
-    const creditoFeito = creditos.reduce((a, { valor, conta, status }) => a + (conta === 'dm' || status === 'feito' ? numeroPositivo(valor) : 0) );
 
+    let creditoFeito = 0;
+    let creditoPendente = 0;
+
+    creditos.forEach(({ valor, conta, status }) => {
+      if (i.conta === 'dm' || i.status === 'feito') {
+        creditoFeito += numeroPositivo(valor);
+      } else {
+        creditoPendente += numeroPositivo(valor);
+      }
+    });
+
+    const creditosTotal = creditoFeito + creditoPendente;
+    const saldo = -1 * debitosTotal + creditosTotal;
     const status = creditoPendente !== 0 && creditoPendente+creditoFeito-debitosTotal === 0
       ? '🗓'
       : creditoFeito === debitosTotal
@@ -21,7 +30,7 @@ const exec = async ({ callback, lib, libLocal }) => {
 
     total += saldo;
 
-    linhas.push(`${status} ${descritivo} | D${debitos.length}$${libLocal.formatReal(debitosTotal)} | C${creditos.length}$${libLocal.formatReal(creditosTotal)} | S$${libLocal.formatReal(saldo)}`);
+    linhas.push(`${status} ${descritivo} | D${debitos.length}$${libLocal.formatReal(debitosTotal)} | C${creditos.length}$${libLocal.formatReal(creditosTotal)} | S ${libLocal.formatReal(saldo)}`);
   });
 
   linhas.push('');
