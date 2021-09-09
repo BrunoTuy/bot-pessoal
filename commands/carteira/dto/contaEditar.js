@@ -20,10 +20,10 @@ const contaEditar = async ({ lib, contaId, extratoId, data }) => {
     const fpSet = {};
 
     if (fpDoc.debitos.filter(({ conta, id }) => id === extratoId && conta === contaId).length > 0) {
-      fpSet.debitos = fpDoc.debitos.filter(({ conta, id }) => id !== extratoId && conta !== contaId);
+      fpSet.debitos = fpDoc.debitos.filter(({ conta, id }) => id !== extratoId || conta !== contaId);
       fpSet.debitos.push(movimento.data);
     } else if (fpDoc.creditos.filter(({ conta, id }) => id === extratoId && conta === contaId).length > 0) {
-      fpSet.creditos = fpDoc.creditos.filter(({ conta, id }) => id !== extratoId && conta !== contaId);
+      fpSet.creditos = fpDoc.creditos.filter(({ conta, id }) => id !== extratoId || conta !== contaId);
       fpSet.creditos.push(movimento.data);
     }
 
