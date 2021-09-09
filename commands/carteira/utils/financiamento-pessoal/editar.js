@@ -36,11 +36,12 @@ const exec = async ({ callback, parametros, lib, subComando }) => {
     } else if (['-d', '+d', '-c', '+c'].includes(operacao)) {
       const conta = parametros.shift();
       const movimento = parametros.shift();
+      const force = parametros.shift();
       const doc = await buscarMovimento(lib, conta, movimento);
 
       if (!doc) {
         callback('Movimento não encontrado.');
-      } else if (doc.data.fp) {
+      } else if (!force && doc.data.fp) {
         callback('Movimento já vinculado a um financiamento.');
       } else {
         dataSet.debitos = fpData.debitos || [];
