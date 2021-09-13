@@ -5,7 +5,7 @@ const exec = async ({ bot, lib, callback, original }) => {
   callback('Espera um pouco');
 
   await atualizar({ lib, callback });
-  qualLocalizacao({ lib, callback, bot, chat: original.chat });
+  setTimeout(() => qualLocalizacao({ lib, callback, bot, chat: original.chat }), 30000);
 };
 
 module.exports = {
