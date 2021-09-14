@@ -1,4 +1,4 @@
-const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal }) => {
+const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal, somenteAtivo }) => {
   const lista = [];
   const totais = {
     feito: 0,
@@ -37,7 +37,10 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
   }
 
   const { db } = lib.firebase;
-  const contas = await db.collection('contas').get();
+  const contasCollection = somenteAtivo
+    ? db.collection('contas').where('ativa', '==', true)
+    : db.collection('contas');
+  const contas = await contasCollection.get();
 
   for (const conta of contas.docs) {
     if (contaNome && contaNome !== conta.data().banco) {

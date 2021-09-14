@@ -1,9 +1,12 @@
-const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, tags, dataTotal }) => {
+const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, tags, dataTotal, somenteAtivo }) => {
   const { db } = lib.firebase;
   const cartoes = [];
-  const cartoesCollection = await db.collection('cartoes').get();
+  const cartoesCollection = somenteAtivo
+    ? db.collection('cartoes').where('ativo', '==', true)
+    : db.collection('cartoes');
+  const cartoesList = await cartoesCollection.get();
 
-  for (const cartao of cartoesCollection.docs) {
+  for (const cartao of cartoesList.docs) {
     if ((!cartaoNome || cartaoNome === cartao.data().nome) && (competencia || cartao.data().competencia || (dataMin && dataMax))) {
       let total = 0;
       let parcelado = 0;
