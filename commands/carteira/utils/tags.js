@@ -88,6 +88,7 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
     });
 
     linhas.push('');
+    linhas.push(`${Object.entries(tags).length} tags encontradas`);
     linhas.push(`<pre>Atualizado ${data}</pre>`);
 
     callback(linhas);
