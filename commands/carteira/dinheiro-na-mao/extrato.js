@@ -1,9 +1,12 @@
 const extrato = require('../dto/dinheiroExtrato.js');
 
 const exec = async ({ parametros, callback, lib, libLocal }) => {
+  const dataAtual = new Date();
   const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
-    : null;
+    : parametros.includes('all')
+      ? null
+      : dataAtual.getFullYear()*100+1+dataAtual.getMonth();
   const mostrarTags = !(parametros.includes('-t'));
   const mostrarDescricao = !(parametros.includes('-d'));
   const linhas = [];
