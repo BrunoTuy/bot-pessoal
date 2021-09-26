@@ -59,7 +59,7 @@ const correrLista = async ({ lista, insert, ano, mes, db }) => {
             descritivo,
             data: dataA,
             contador: idx,
-            nome: item.banco,
+            nome: item.nome,
             itemId: item.id,
             recorrente: rec,
             competencia: item.competencia
