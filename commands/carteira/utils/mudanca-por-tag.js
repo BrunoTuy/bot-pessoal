@@ -9,7 +9,7 @@ const ajustarTag = (lista, operacao, tag, baseTag) => {
     nLista = ajustarTag(nLista, '-t', baseTag);
     nLista = ajustarTag(nLista, '+t', tag);
   } else if (operacao === '-t') {
-    nLista = lista.filter(t => t.toLowerCase() !== tag);
+    nLista = lista.filter(t => t !== tag);
   } else  if (!nLista.find(t => t === tag)) {
     nLista.push(tag);
   }
@@ -35,7 +35,7 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
 
     const tag = arrTag.join(' ');
     const operacao = parametros.shift();
-    const tagOperacao = parametros.join(' ').trim().toLowerCase();
+    const tagOperacao = parametros.join(' ').trim();
     const buscarResumoTag = Object.entries(tags).find(([key, value]) => key === tag);
     const data = new Date(atualizado);
 
