@@ -35,7 +35,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     const obj = { lib, tags, dataMin, dataMax, competencia };
     const contas = competencia ? {lista: [], totais: {feito: 0, previsto: 0}} : await extrato.exec(obj);
     const cartoes = await cartaoExtrato.exec(obj);
-    const extratoExecutado = competencia ? {lista: [], totais: {feito: 0, previsto: 0}} : await dinheiroExtrato.exec(obj);
+    const extratoExecutado = competencia ? {lista: [], total: 0} : await dinheiroExtrato.exec(obj);
     let total = 0;
 
     for (const c of contas.lista) {
