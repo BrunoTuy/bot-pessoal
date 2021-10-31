@@ -51,14 +51,15 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
     let previsto = 0;
     const extratoLista = [];
     const dbCollection = db.collection('contas').doc(conta.id).collection('extrato');
-    const extratoCollection = tags && tags.length > 0
-      ? dbCollection
-          .where('tags', 'array-contains-any', tags)
-      : dataTotal 
-        ? dbCollection
-        : dbCollection
-            .where('data', '>=', dataMin.getTime())
-            .where('data', '<=', dataMax.getTime());
+    let extratoCollection = tags && tags.length > 0
+      ? dbCollection.where('tags', 'array-contains-any', tags)
+      : dbCollection;
+
+    if (dataMin && dataMax) {
+      extratoCollection = extratoCollection
+        .where('data', '>=', dataMin.getTime())
+        .where('data', '<=', dataMax.getTime());
+    }
 
     const extrato = await extratoCollection
       .orderBy('data')

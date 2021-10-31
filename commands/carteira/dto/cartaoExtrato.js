@@ -14,17 +14,19 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, ta
       let avista = 0;
       const fatura = [];
       const dbCollection = db.collection('cartoes').doc(cartao.id).collection('fatura');
-      const faturaCollection = tags && tags.length > 0
+      let faturaCollection = tags && tags.length > 0
         ? dbCollection
             .where('tags', 'array-contains-any', tags)
-        : dataMin && dataMax 
+        : dataTotal
           ? dbCollection
-              .where('data', '>=', dataMin.getTime())
-              .where('data', '<=', dataMax.getTime())
-          : dataTotal
-            ? dbCollection
-            : dbCollection
-                .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
+          : dbCollection
+              .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
+
+      if (!dataTotal && dataMin && dataMax) {
+        faturaCollection = faturaCollection
+          .where('data', '>=', dataMin.getTime())
+          .where('data', '<=', dataMax.getTime());
+      }
 
       const list = await faturaCollection
           .orderBy('data')

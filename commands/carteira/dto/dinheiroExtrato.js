@@ -4,14 +4,16 @@ const exec = async ({ dataMin, dataMax, lib, tags }) => {
   let total = 0;
 
   const dbCollection = db.collection('dinheiro');
-  const dinheiroCollection = tags && tags.length > 0
+  let dinheiroCollection = tags && tags.length > 0
     ? dbCollection
         .where('tags', 'array-contains-any', tags)
-    : dataMin && dataMax 
-      ? dbCollection
-          .where('data', '>=', dataMin.getTime())
-          .where('data', '<=', dataMax.getTime())
-      : dbCollection;
+    : dbCollection;
+
+  if (dataMin && dataMax) {
+    dinheiroCollection = dinheiroCollection
+      .where('data', '>=', dataMin.getTime())
+      .where('data', '<=', dataMax.getTime());
+  }
 
   const list = await dinheiroCollection
       .orderBy('data')
