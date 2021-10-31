@@ -9,6 +9,7 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
   } else {
     let dataMin = false;
     let dataMax = false;
+    let competencia = false;
 
     if (parametros[0].indexOf('-d') === 0) {
       const list = parametros.shift().split(':');
@@ -19,14 +20,22 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
       }
     }
 
+    if (parametros[0].indexOf('-c') === 0) {
+      const list = parametros.shift().split(':');
+
+      if (list.length === 2 && list[1].length === 6 && parseInt(list[1]) > 202101) {
+        competencia = parseInt(list[1]);
+      }
+    }
+
     const parametrosTexto = parametros.join(' ');
     const tags = parametrosTexto.split(',').map(t => t.trim());
     const mostrarTags = true;
     const mostrarDescricao = true;
     const obj = { lib, tags, dataMin, dataMax };
-    const contas = await extrato.exec(obj);
+    const contas = competencia ? {lista: []} : await extrato.exec(obj);
     const cartoes = await cartaoExtrato.exec(obj);
-    const extratoExecutado = await dinheiroExtrato.exec(obj);
+    const extratoExecutado = competencia ? {lista: []} : await dinheiroExtrato.exec(obj);
     let total = 0;
 
     for (const c of contas.lista) {
