@@ -28,6 +28,11 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, ta
           .where('data', '<=', dataMax.getTime());
       }
 
+      if (competencia) {
+        faturaCollection = faturaCollection
+          .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
+      }
+
       const list = await faturaCollection
           .orderBy('data')
           .get();
