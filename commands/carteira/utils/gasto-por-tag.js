@@ -32,10 +32,10 @@ const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
     const tags = parametrosTexto.split(',').map(t => t.trim());
     const mostrarTags = true;
     const mostrarDescricao = true;
-    const obj = { lib, tags, dataMin, dataMax };
-    const contas = competencia ? {lista: []} : await extrato.exec(obj);
+    const obj = { lib, tags, dataMin, dataMax, competencia };
+    const contas = competencia ? {lista: [], totais: {feito: 0, previsto: 0}} : await extrato.exec(obj);
     const cartoes = await cartaoExtrato.exec(obj);
-    const extratoExecutado = competencia ? {lista: []} : await dinheiroExtrato.exec(obj);
+    const extratoExecutado = competencia ? {lista: [], totais: {feito: 0, previsto: 0}} : await dinheiroExtrato.exec(obj);
     let total = 0;
 
     for (const c of contas.lista) {
