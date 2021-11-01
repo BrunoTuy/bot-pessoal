@@ -12,7 +12,16 @@ const exec = async ({ callback, lib, libLocal, subComando, parametros }) => {
       let creditoFeito = 0;
       let creditoPendente = 0;
       const linhas = [];
-      const { descritivo, debitos, creditos } = doc.data();
+      const { descritivo } = doc.data();
+      let { debitos, creditos } = doc.data();
+
+      if (!debitos) {
+        debitos = [];
+      }
+
+      if (!creditos) {
+        creditos = [];
+      }
 
       linhas.push(descritivo);
       linhas.push('');
