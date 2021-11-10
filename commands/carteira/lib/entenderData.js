@@ -7,6 +7,22 @@ const entenderData = entrada => {
     data.setDate(data.getDate()+1);
   } else if (entrada.length < 3) {
     data.setDate(entrada);
+  } else if (entrada.toLowerCase() === 'imes') {
+    data.setDate(1);
+  } else if (entrada.toLowerCase() === 'fmes') {
+    if (data.getMonth() > 10) {
+      data.setFullYear(data.getFullYear(+1));
+      data.setMonth(1);
+    } else {
+      data.setMonth(data.getMonth()+1);
+    }
+
+    data.setDate(1);
+    data.setDate(data.getDate()-1);
+  } else if (entrada.toLowerCase() === 'iano') {
+    data.setMonth(0, 1);
+  } else if (entrada.toLowerCase() === 'fano') {
+    data.setMonth(11, 31);
   } else if (entrada !== 'hoje') {
     const arrayData = entrada.split('-');
     let ano = false;
