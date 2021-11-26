@@ -3,7 +3,11 @@ const numeroPositivo = valor => parseInt(valor) < 0 ? parseInt(valor) * -1 : par
 const exec = async ({ callback, lib, libLocal }) => {
   const list = await lib.firebase.db.collection('fp').get();
   const linhas = [];
-  let total = 0;
+  const totais = {
+    debitos: 0,
+    creditoFeito: 0,
+    creditoPendente: 0
+  };
 
   list.docs.forEach(i => {
     const { descritivo, debitos = [], creditos = [] } = i.data();
@@ -20,22 +24,25 @@ const exec = async ({ callback, lib, libLocal }) => {
       }
     });
 
-    const creditosTotal = creditoFeito + creditoPendente;
-    const saldo = -1 * debitosTotal + creditosTotal;
+    totais.debitos += debitosTotal;
+    totais.creditoFeito += creditoFeito;
+    totais.creditoPendente += creditoPendente;
+
     const status = creditoPendente !== 0 && creditoPendente+creditoFeito-debitosTotal === 0
       ? '🗓'
       : creditoFeito === debitosTotal
         ? '✅'
         : '❌';
 
-    total += saldo;
-
-    linhas.push(`${status} ${descritivo} | D ${debitos.length} C ${creditos.length} Saldo ${libLocal.formatReal(saldo)}`);
+    linhas.push(`${status} ${descritivo} | 🧮 ${libLocal.formatReal(debitosTotal)} ✅ ${libLocal.formatReal(creditoFeito)} 🗓 ${libLocal.formatReal(creditoPendente)}`);
   });
 
   linhas.push('');
   linhas.push(`Financiamentos ${list.size}`);
-  linhas.push(`Saldo R$ ${libLocal.formatReal(total)}`);
+  linhas.push(`Débitos R$ ${libLocal.formatReal(totais.debitos)}`);
+  linhas.push(`Pago R$ ${libLocal.formatReal(totais.creditoFeito)}`);
+  linhas.push(`Pendente cadastrado R$ ${libLocal.formatReal(totais.creditoPendente)}`);
+  linhas.push(`Pendente sem cadastro R$ ${libLocal.formatReal(totais.debitos-totais.creditoPendente-totais.creditoFeito)}`);
 
   callback(linhas);
 };
