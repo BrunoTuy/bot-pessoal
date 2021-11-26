@@ -36,7 +36,7 @@ const exec = async ({ callback, lib, libLocal }) => {
 
     const semParcelas = debitosTotal-creditoPendente-creditoFeito !== 0
       ? ` ⁉️ ${libLocal.formatReal(debitosTotal-creditoPendente-creditoFeito)}`
-      : null;
+      : '';
 
     linhas.push(`${status} ${descritivo} | ⛔️ ${libLocal.formatReal(debitosTotal)} ✅ ${libLocal.formatReal(creditoFeito)} 🔢 ${libLocal.formatReal(creditoPendente)}${semParcelas}`);
   });
