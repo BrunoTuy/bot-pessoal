@@ -33,12 +33,17 @@ const exec = async ({ callback, lib, libLocal }) => {
       : creditoFeito === debitosTotal
         ? '✅'
         : '❌';
-
+    const pago = creditoFeito !== 0
+      ? ` ✅ ${libLocal.formatReal(creditoFeito)}`
+      : ''
+    const parcelado = creditoPendente !== 0
+      ? ` 🔢 ${libLocal.formatReal(creditoPendente)}`
+      : '';
     const semParcelas = debitosTotal-creditoPendente-creditoFeito !== 0
       ? ` ⁉️ ${libLocal.formatReal(debitosTotal-creditoPendente-creditoFeito)}`
       : '';
 
-    linhas.push(`${status} ${descritivo} | ⛔️ ${libLocal.formatReal(debitosTotal)} ✅ ${libLocal.formatReal(creditoFeito)} 🔢 ${libLocal.formatReal(creditoPendente)}${semParcelas}`);
+    linhas.push(`${status} ${descritivo} | ⛔️ ${libLocal.formatReal(debitosTotal)}${pago}${parcelado}${semParcelas}`);
   });
 
   linhas.push('');
