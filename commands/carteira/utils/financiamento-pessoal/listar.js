@@ -34,15 +34,15 @@ const exec = async ({ callback, lib, libLocal }) => {
         ? '✅'
         : '❌';
 
-    linhas.push(`${status} ${descritivo} | 🧮 ${libLocal.formatReal(debitosTotal)} ✅ ${libLocal.formatReal(creditoFeito)} 🗓 ${libLocal.formatReal(creditoPendente)}`);
+    linhas.push(`${status} ${descritivo} | ⛔️ ${libLocal.formatReal(debitosTotal)} ✅ ${libLocal.formatReal(creditoFeito)} 🔢 ${libLocal.formatReal(creditoPendente)} ⁉️ ${libLocal.formatReal(debitosTotal-creditoPendente-creditoFeito)}`);
   });
 
   linhas.push('');
   linhas.push(`Financiamentos ${list.size}`);
-  linhas.push(`Débitos R$ ${libLocal.formatReal(totais.debitos)}`);
-  linhas.push(`Pago R$ ${libLocal.formatReal(totais.creditoFeito)}`);
-  linhas.push(`Pendente cadastrado R$ ${libLocal.formatReal(totais.creditoPendente)}`);
-  linhas.push(`Pendente sem cadastro R$ ${libLocal.formatReal(totais.debitos-totais.creditoPendente-totais.creditoFeito)}`);
+  linhas.push(`⛔️ Débitos R$ ${libLocal.formatReal(totais.debitos)}`);
+  linhas.push(`✅ Pago R$ ${libLocal.formatReal(totais.creditoFeito)}`);
+  linhas.push(`🔢 Parcelado R$ ${libLocal.formatReal(totais.creditoPendente)}`);
+  linhas.push(`⁉️ Sem parcelas R$ ${libLocal.formatReal(totais.debitos-totais.creditoPendente-totais.creditoFeito)}`);
 
   callback(linhas);
 };
