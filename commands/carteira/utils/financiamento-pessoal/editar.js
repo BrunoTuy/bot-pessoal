@@ -41,7 +41,7 @@ const exec = async ({ callback, parametros, lib, subComando }) => {
 
       if (!doc) {
         callback('Movimento não encontrado.');
-      } else if (!force && doc.data.fp) {
+      } else if (!force && doc.data.fp && !['-d', '-c'].includes(operacao)) {
         callback('Movimento já vinculado a um financiamento.');
       } else {
         dataSet.debitos = fpData.debitos || [];
