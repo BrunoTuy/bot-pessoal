@@ -4,8 +4,8 @@ const editar = require('./editar.js');
 
 const exec = async ({ callback, parametros, lib, libLocal, subComando }) => {
   const valorPendente = ({ debitos, creditos }) => {
-    const totalDebitos = debitos.reduce((a, { valor }) => a + libLocal.numeroPositivo(valor), 0);
-    const totalCreditos = creditos.reduce((a, { valor }) => a + libLocal.numeroPositivo(valor), 0);
+    const totalDebitos = !debitos || !debitos.reduce ? 0 : debitos.reduce((a, { valor }) => a + libLocal.numeroPositivo(valor), 0);
+    const totalCreditos = !creditos || !creditos.reduce ? 0 : creditos.reduce((a, { valor }) => a + libLocal.numeroPositivo(valor), 0);
 
     return totalDebitos-totalCreditos;
   };
@@ -13,7 +13,9 @@ const exec = async ({ callback, parametros, lib, libLocal, subComando }) => {
 
   if (parametros.length < 3) {
     const list = await db.collection('fp').get();
-    const linhas = list.docs.map(i => `${i.id} ${i.data().descritivo} ⁉️ ${libLocal.formatReal(valorPendente(i.data()))}`);
+    const linhas = list.docs
+      .filter(i => valorPendente(i.data()) > 0)
+      .map(i => `${i.id} ${i.data().descritivo} ⁉️ ${libLocal.formatReal(valorPendente(i.data()))}`);
 
     linhas.push('');
     linhas.push('Para gerar parcelas use:');
