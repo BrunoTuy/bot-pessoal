@@ -49,7 +49,7 @@ const exec = async ({ callback, parametros, lib, libLocal, subComando }) => {
         parametrosObj: {
           tags: ['fp'],
           data: dataInicio,
-          valor: x === parcelas ? ultimaParcela : parcela,
+          valor: (x === parcelas ? ultimaParcela : parcela)*-1,
           descritivo: `${fpData.descritivo} parc ${x}.${parcelas}`,
           conta: 'nubank'
         }
