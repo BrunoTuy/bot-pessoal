@@ -42,6 +42,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 };
 
 module.exports = {
-  alias: ['p'],
+  alias: ['pe'],
   exec,
 };

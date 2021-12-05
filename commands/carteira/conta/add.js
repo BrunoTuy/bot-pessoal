@@ -47,7 +47,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           descritivo,
           status,
           recorrente,
-          tags
+          tags,
         });
 
         callback([
@@ -57,6 +57,11 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           `${(tags || []).map(t => `[${t.trim()}]`).join(' ')}`,
           `✅ Inserido ${contaDoc.id} ${retorno.id}`
         ]);
+
+        return {
+          conta: contaDoc.id,
+          movimento: retorno.id,
+        };
       }
     }
   }

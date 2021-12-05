@@ -1,5 +1,3 @@
-const numeroPositivo = valor => parseInt(valor) < 0 ? parseInt(valor) * -1 : parseInt(valor);
-
 const exec = async ({ callback, lib, libLocal }) => {
   const list = await lib.firebase.db.collection('fp').get();
   const linhas = [];
@@ -11,16 +9,16 @@ const exec = async ({ callback, lib, libLocal }) => {
 
   list.docs.forEach(i => {
     const { descritivo, debitos = [], creditos = [] } = i.data();
-    const debitosTotal = debitos.reduce((a, { valor }) => a + numeroPositivo(valor), 0);
+    const debitosTotal = debitos.reduce((a, { valor }) => a + libLocal.numeroPositivo(valor), 0);
 
     let creditoFeito = 0;
     let creditoPendente = 0;
 
     creditos.forEach(({ valor, conta, status }) => {
       if (conta === 'dm' || status === 'feito') {
-        creditoFeito += numeroPositivo(valor);
+        creditoFeito += libLocal.numeroPositivo(valor);
       } else {
-        creditoPendente += numeroPositivo(valor);
+        creditoPendente += libLocal.numeroPositivo(valor);
       }
     });
 
