@@ -14,10 +14,11 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, ta
       let avista = 0;
       const fatura = [];
       const dbCollection = db.collection('cartoes').doc(cartao.id).collection('fatura');
+
       let faturaCollection = tags && tags.length > 0
         ? dbCollection
             .where('tags', 'array-contains-any', tags)
-        : dataTotal
+        : dataTotal || !competencia
           ? dbCollection
           : dbCollection
               .where('competencia', '==', parseInt(competencia || cartao.data().competencia));

@@ -12,6 +12,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     dataMin.setMinutes(0);
     dataMin.setSeconds(0);
     dataMin.setMilliseconds(0);
+    dataMin.setHours(dataMin.getHours() - 3);
 
     dataMax.setHours(23);
     dataMax.setMinutes(59);
