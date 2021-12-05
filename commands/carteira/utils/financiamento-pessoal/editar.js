@@ -48,9 +48,9 @@ const exec = async ({ callback, parametros, lib, subComando }) => {
         dataSet.creditos = fpData.creditos || [];
 
         if (operacao === '-d') {
-          dataSet.debitos = dataSet.debitos.filter((i) => i.id !== movimento && i.conta !== conta);
+          dataSet.debitos = dataSet.debitos.filter((i) => i.id !== movimento || i.conta !== conta);
         } else if (operacao === '-c') {
-          dataSet.creditos = dataSet.creditos.filter((i) => i.id !== movimento && i.conta !== conta);
+          dataSet.creditos = dataSet.creditos.filter((i) => i.id !== movimento || i.conta !== conta);
         } else if (operacao === '+d') {
           dataSet.debitos.push(doc.data);
         } else {
