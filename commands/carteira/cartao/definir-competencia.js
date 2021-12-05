@@ -2,7 +2,7 @@ const exec = async ({ parametros, subComando, callback, lib }) => {
   if (parametros.length != 2) {
     callback([
       'Para editar a competêcia use',
-      `${subComando} {node do cartão} {nova competencia}`
+      `${subComando} {nome do cartão} {nova competencia}`
     ]);
   } else {
     const { db } = lib.firebase;
@@ -12,7 +12,7 @@ const exec = async ({ parametros, subComando, callback, lib }) => {
     const mes = competencia.toString().substring(4, 6);
     const data = new Date();
 
-    if (data.getFullYear() > ano || data.getMonth()+1 > mes) {
+    if (data.getFullYear() > ano || (data.getFullYear() >= ano && data.getMonth()+1 > mes)) {
       callback('Competência inválida');
     } else {
       let mudou = false;
