@@ -18,8 +18,12 @@ const atualizar = async ({ lib, callback }) => {
     const { data } = await axios.get(docData.xml);
     const { response } = xmlParser.toJson(data, { object: true });
     const coll = await db.collection('findme').doc(id).collection('historico');
-    const messages = response.feedMessageResponse.messages.message
-      .filter(m => parseInt(m.unixTime) > (lastUnixTime || 0));
+    const { message } = response.feedMessageResponse.messages;
+    const messages = message.filter
+      ? (m => parseInt(m.unixTime) > (lastUnixTime || 0))
+      : message.unixTime && message.unixTime > (lastUnixTime || 0)
+        ? [message]
+        : [];
 
     messages.forEach(async m => {
       const date = new Date(m.dateTime);
