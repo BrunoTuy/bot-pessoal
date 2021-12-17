@@ -43,7 +43,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
   const contas = await contasCollection.get();
 
   for (const conta of contas.docs) {
-    if (contaNome && contaNome !== conta.data().banco) {
+    if (contaNome && contaNome !== conta.data().banco && contaNome !== conta.data().sigla) {
       continue;
     }
 

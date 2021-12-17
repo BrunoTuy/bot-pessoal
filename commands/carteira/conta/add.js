@@ -23,8 +23,13 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
       const recorrente = parametrosObj && parametrosObj.recorrente ? parametrosObj.recorrente : null;
       const { db } = lib.firebase;
 
-      const queryRef = db.collection('contas').where('banco', '==', conta);
-      const contasGet = await queryRef.get();
+      let queryRef = db.collection('contas').where('banco', '==', conta);
+      let contasGet = await queryRef.get();
+
+      if (contasGet.size !== 1) {
+        queryRef = db.collection('contas').where('sigla', '==', conta);
+        contasGet = await queryRef.get();
+      }
 
       if (contasGet.size !== 1) {
         callback('Conta não cadastrada.');
