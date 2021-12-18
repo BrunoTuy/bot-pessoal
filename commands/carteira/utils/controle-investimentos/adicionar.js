@@ -19,17 +19,6 @@ const exec = async ({ parametros, callback, subComando, lib, libLocal, bot, orig
     const ativo = (libLocal.capturarParametro(parametrosTexto, 'n') || '').toUpperCase();
     const cadastrarAtivo = libLocal.capturarParametro(parametrosTexto, 'add');
 
-    console.log(' -- Entrada', {
-      paramDataEntrada,
-      valor,
-      tipo,
-      paramCotas,
-      paramRendimento,
-      paramDataSaida,
-      corretora,
-      ativo,
-    });
-
     if (!['CDB', 'FII', 'TESOURO'].includes(tipo)) {
       callback([
         `Tipo de investimento não reconhecido (${tipo})`,
