@@ -1,6 +1,6 @@
 const numeroPositivo = valor => parseInt(valor) < 0 ? parseInt(valor) * -1 : parseInt(valor);
 
-const exec = async ({ callback, lib, libLocal, subComando, parametros }) => {
+const exec = async ({ callback, lib, libLocal, subComando, parametros, original, bot }) => {
   if (parametros.length === 1) {
     const codigo = parametros.shift();
     const doc = await lib.firebase.db.collection('fp').doc(codigo).get();
@@ -67,13 +67,17 @@ const exec = async ({ callback, lib, libLocal, subComando, parametros }) => {
     }
   } else {
     const list = await lib.firebase.db.collection('fp').get();
-    const linhas = list.docs.map(i => `<pre>${i.id} - ${i.data().descritivo}</pre>`);
+    const linhas = list.docs.map(i => [{
+      text: `${i.data().descritivo}`,
+      callback_data: `${subComando} ${i.id}`,
+    }]);
   
-    linhas.push('');
-    linhas.push('Para ver informações');
-    linhas.push(`<pre>${subComando} {codigo}</pre>`);
-  
-    callback(linhas);
+    bot.sendMessage( original.chat.id, 'Ver informações', {
+      reply_to_message_id: original.message_id,
+      reply_markup: JSON.stringify({
+        inline_keyboard: linhas
+      })
+    });
   }
 };
 
