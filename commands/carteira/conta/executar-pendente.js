@@ -1,6 +1,6 @@
 const editar = require('../dto/contaEditar.js');
 
-const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal, original, bot }) => {
   const { db } = lib.firebase;
 
   if (parametros.length === 2) {
@@ -32,23 +32,27 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         .orderBy('data')
         .get();
 
-      extrato.size > 0 && linhas.push(`${conta.data().banco.toUpperCase()}`);
-
       for (const i of extrato.docs) {
         const { data, status, valor, descritivo } = i.data();
         const formatStatus = status === 'previsto fixo'
           ? 'PF'
           : 'PC'
 
-        linhas.push(`<pre>${conta.id} ${i.id} ${libLocal.formatData(data)} ${formatStatus} R$${libLocal.formatReal(valor)} ${descritivo}</pre>`);
+        linhas.push([{
+          text: `${conta.data().banco.toUpperCase()} ${libLocal.formatData(data)} ${formatStatus} R$ ${libLocal.formatReal(valor)} ${descritivo}`,
+          callback_data: `cc xp ${conta.id} ${i.id}`
+        }]);
       }
-
-      extrato.size > 0 && linhas.push('');
     }
 
-    linhas.push(`${subComando} {conta id} {movimento id}`);
+    const opts = {
+      reply_to_message_id: original.message_id,
+      reply_markup: JSON.stringify({
+        inline_keyboard: linhas
+      })
+    };
 
-    callback(linhas);
+    bot.sendMessage( original.chat.id, 'Executar pendência', opts );
   }
 }
 

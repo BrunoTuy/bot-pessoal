@@ -21,8 +21,8 @@ const app = express();
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
 const banco = require( './lib/banco.js' )( firebase );
 
-bot.on( 'message', async ( msg ) => {
-  console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, msg.text );
+const messageProcess = async ( msg, text ) => {
+  console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, text );
 
   const allowed = (process.env.CHAT_ALLOWED || '').split(',').includes(msg.chat.id.toString());
   const commands = {};
@@ -31,10 +31,10 @@ bot.on( 'message', async ( msg ) => {
     if (allowed || !i[1].restricted) {
       commands[i[0]] = i[1];
     }
-  })
+  });
 
   const { ultimoComando, contexto } = await banco.getChatData(msg.chat.id);
-  const parametros = msg.text ? msg.text.split( ' ' ) : [''];
+  const parametros = text ? text.split( ' ' ) : [''];
   const comando = parametros[0].indexOf('/') === 0
     ? parametros.shift().substring( 1 ).split( '@' )[0].toLowerCase()
     : ultimoComando && commands[ultimoComando] && commands[ultimoComando].context
@@ -68,7 +68,7 @@ bot.on( 'message', async ( msg ) => {
       contexto,
       parametros,
       original: msg,
-      callback: ( resp ) => enviar( msg.chat.id, resp ),
+      callback: ( resp ) => enviar( msg.chat.id, resp, msg.message_id ),
       lib: { banco, firebase }
     });
 
@@ -77,7 +77,10 @@ bot.on( 'message', async ( msg ) => {
       ultimoComando: comando
     });
   }
-});
+};
+
+bot.on( 'callback_query', ({ message, data }) => messageProcess( message, data ));
+bot.on( 'message', ( msg ) => messageProcess( msg, msg.text ));
 
 app.use(express.json());
 app.post(`/bot${TOKEN}`, (req, res) => {
