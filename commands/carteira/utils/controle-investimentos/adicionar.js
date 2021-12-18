@@ -92,6 +92,13 @@ const exec = async ({ parametros, callback, subComando, lib, libLocal, bot, orig
             rendimento,
             corretora,
           });
+        } else if (tipo === 'FII') {
+          objAtivo.lista.push({
+            datas: { entrada: dataEntrada },
+            valor,
+            cotas,
+            corretora,
+          });
         } else {
           console.log('Tipo ainda não mapeado');
           return;
@@ -103,7 +110,7 @@ const exec = async ({ parametros, callback, subComando, lib, libLocal, bot, orig
           docRef.set(objAtivo);
         }
 
-        callback('veja no console');
+        callback('Investimento cadastrado!!!');
       }
     }
 
