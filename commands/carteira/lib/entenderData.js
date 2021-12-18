@@ -1,5 +1,7 @@
 const entenderData = entrada => {
   const data = new Date();
+  
+  data.setHours(12);
 
   if (entrada === 'ontem') {
     data.setDate(data.getDate()-1);

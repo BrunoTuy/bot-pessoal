@@ -19,10 +19,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       parametros: ['nubank', 1, data, valor, descritivo]
     });
   }
-}
+};
 
 module.exports = {
   alias: ['na'],
   exec,
   descricao: 'Compra avista no cartão nubank'
-}
+};

@@ -19,10 +19,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       parametros: ['br', 1, data, valor, descritivo]
     });
   }
-}
+};
 
 module.exports = {
   alias: ['ia'],
   exec,
   descricao: 'Compra avista no cartão Petrobras'
-}
+};
