@@ -1,9 +1,8 @@
 const extrato = require('../dto/dinheiroExtrato.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal, original, bot }) => {
   if (parametros.length === 1 && parametros[0].length < 10) {
     const linhas = [];
-    let extratoVazio = true;
     const data = libLocal.entenderData(parametros.shift());
     const dataMin = new Date(data);
     const dataMax = new Date(data);
@@ -18,10 +17,8 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     dataMax.setSeconds(59);
     dataMax.setMilliseconds(999);
 
-    linhas.push(`Data ${libLocal.formatData(data)}`);
-
     const extratoExecutado = await extrato.exec({ dataMin, dataMax, lib });
-console.log('-- lista', extratoExecutado)
+
     for (const e of extratoExecutado.lista) {
       const tags = e.tags && e.tags.length > 0
         ? e.tags.map(t => `[${t}]`).join(' ')
@@ -29,15 +26,24 @@ console.log('-- lista', extratoExecutado)
 
       const descricao = e.descritivo;
 
-      extratoVazio = false;
-      linhas.push(`<pre>${e.id} R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}</pre>`);
-      linhas.push('');
+      linhas.push([{
+        text: `R$ ${libLocal.formatReal(e.valor)} ${tags || '-'} ${descricao || ''}`,
+        callback_data: `dm del ${e.id}`,
+      }]);
     }
 
-    if (extratoVazio) {
-      linhas.push('Nenhuma movimentação encontrada nesta data');
+    if (linhas.length > 0) {
+      bot.sendMessage( original.chat.id, 'Apagar movimentação', {
+        reply_to_message_id: original.message_id,
+        reply_markup: JSON.stringify({
+          inline_keyboard: linhas
+        })
+      });
     } else {
-      linhas.push(`${subComando} {id movimentação}`);
+      callback([
+        `Data ${libLocal.formatData(data)}`,
+        'Nenhuma movimentação encontrada nesta data'
+      ]);
     }
 
     callback(linhas);
@@ -65,7 +71,6 @@ console.log('-- lista', extratoExecutado)
       callback('Registro não encontrado');
     }
   } else {
-    console.log(parametros);
     callback([
       'Exemplo do comando abaixo',
       `${subComando} {data}`

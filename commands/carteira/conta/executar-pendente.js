@@ -46,14 +46,12 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, original,
     }
 
     if (linhas.length > 0) {
-      const opts = {
+      bot.sendMessage( original.chat.id, 'Executar pendência', {
         reply_to_message_id: original.message_id,
         reply_markup: JSON.stringify({
           inline_keyboard: linhas
         })
-      };
-
-      bot.sendMessage( original.chat.id, 'Executar pendência', opts );
+      });
     } else {
       callback('Nenhuma pendência encontrada');
     }
