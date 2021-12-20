@@ -20,9 +20,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     const contas = await db.collection('contas').get();
 
     for (const conta of contas.docs) {
-      if (contaOrigem === conta.data().banco) {
+      if (contaOrigem === conta.data().banco || contaOrigem === conta.data().sigla) {
         contasId.origem = conta.id;
-      } else if (contaDestino === conta.data().banco) {
+      } else if (contaDestino === conta.data().banco || contaDestino === conta.data().sigla) {
         contasId.destino = conta.id;
       }
     }
