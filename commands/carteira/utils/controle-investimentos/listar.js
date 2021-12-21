@@ -74,15 +74,15 @@ const exec = async ({ callback, lib, libLocal }) => {
   const totalAplicado = totalGeral.CDB + totalGeral.TESOURO + totalGeral.FII;
 
   linhas.push('');
-  linhas.push(`🏦 CDB ${(totalGeral.CDB/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.CDB)}`);
-  linhas.push(`🇧🇷 Tesouro ${(totalGeral.TESOURO/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.TESOURO)}`);
-  linhas.push(`🏢 FII ${(totalGeral.FII/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.FII)}`);
-  linhas.push('');
   linhas.push(`1️⃣ até 90 dias R$ ${libLocal.formatReal(totalGeral.primeiro)}`);
   linhas.push(`2️⃣ até 180 dias R$ ${libLocal.formatReal(totalGeral.segundo)}`);
   linhas.push(`3️⃣ até 180 dias R$ ${libLocal.formatReal(totalGeral.terceiro)}`);
   linhas.push(`4️⃣ até 365 dias R$ ${libLocal.formatReal(totalGeral.quarto)}`);
   linhas.push(`⏩ mais de 1 ano R$ ${libLocal.formatReal(totalGeral.longo)}`);
+  linhas.push('');
+  linhas.push(`🏦 CDB ${(totalGeral.CDB/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.CDB)}`);
+  linhas.push(`🇧🇷 Tesouro ${(totalGeral.TESOURO/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.TESOURO)}`);
+  linhas.push(`🏢 FII ${(totalGeral.FII/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.FII)}`);
   linhas.push('');
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(totalAplicado)}`);
 
