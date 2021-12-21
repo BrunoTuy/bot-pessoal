@@ -51,7 +51,7 @@ const exec = async ({ parametros, callback, subComando, lib, libLocal, bot, orig
         };
 
         const cotas = paramCotas && !isNaN(paramCotas)
-          ? parseInt(paramCotas)
+          ? parseFloat(paramCotas)
           : null;
         const dataEntrada = libLocal.entenderData(paramDataEntrada);
         const dataSaida = paramDataSaida
