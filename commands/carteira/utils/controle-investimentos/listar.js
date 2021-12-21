@@ -45,23 +45,23 @@ const exec = async ({ callback, lib, libLocal }) => {
     })
 
     const t1 = totais.primeiro
-      ? ` 1️⃣ ${libLocal.formatReal(totais.primeiro)}`
+      ? `1️⃣ ${libLocal.formatReal(totais.primeiro)} `
       : '';
     const t2 = totais.segundo
-      ? ` 2️⃣ ${libLocal.formatReal(totais.segundo)}`
+      ? `2️⃣ ${libLocal.formatReal(totais.segundo)} `
       : '';
     const t3 = totais.terceiro
-      ? ` 3️⃣ ${libLocal.formatReal(totais.terceiro)}`
+      ? `3️⃣ ${libLocal.formatReal(totais.terceiro)} `
       : '';
     const t4 = totais.quarto
-      ? ` 4️⃣ ${libLocal.formatReal(totais.quarto)}`
+      ? `4️⃣ ${libLocal.formatReal(totais.quarto)} `
       : '';
     const tl = totais.longo
-      ? ` ⏩ ${libLocal.formatReal(totais.longo)}`
+      ? `⏩ ${libLocal.formatReal(totais.longo)}`
       : '';
     const total = totais.primeiro + totais.segundo + totais.terceiro + totais.quarto + totais.longo;
 
-    total > 0 && linhas.push(`${i.id} R$ ${libLocal.formatReal(total)}${t1}${t2}${t3}${t4}${tl}`);
+    total > 0 && linhas.push(`${i.id} R$ ${libLocal.formatReal(total)} (${t1}${t2}${t3}${t4}${tl})`);
 
     totalGeral[tipo] += total;
     totalGeral.primeiro += totais.primeiro;
