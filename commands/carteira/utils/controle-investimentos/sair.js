@@ -43,7 +43,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, original,
       const ativo = list.docs.find(l => id === l.id);
       const { lista } = ativo.data();
 
-      if (!ativo || lista.length >= idx+1) {
+      if (!ativo || lista.length > idx+1) {
         callback('Ativo não reconhecido.');
       } else if (['CDB', 'TESOURO'].includes(ativo.data().tipo)) {
         const docRef = lib.firebase.db.collection('cofre').doc(`${id}`);
