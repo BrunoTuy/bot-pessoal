@@ -29,10 +29,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     totais.parcelado += cartao.parcelado;
     totais.recorrente += cartao.recorrente;
 
-    linhas.push(`<b>💳 ${cartao.nome.toUpperCase()}</b> 🗓 <pre>${competencia || cartao.competencia}</pre>`);
-    cartao.avista > 0 && linhas.push(`<pre>1️⃣ R$ ${libLocal.formatReal(cartao.avista)}</pre> ${(cartao.avista/cartao.total*100).toPrecision(2)}%`);
-    cartao.parcelado > 0 && linhas.push(`<pre>🔢 R$ ${libLocal.formatReal(cartao.parcelado)}</pre> ${(cartao.parcelado/cartao.total*100).toPrecision(2)}%`);
-    cartao.recorrente > 0 && linhas.push(`<pre>🔁 R$ ${libLocal.formatReal(cartao.recorrente)}</pre> ${(cartao.recorrente/cartao.total*100).toPrecision(2)}%`);
+    linhas.push(`💳 ${cartao.nome.toUpperCase()} 🗓 ${competencia || cartao.competencia}`);
+    cartao.avista > 0 && linhas.push(`<pre>1️⃣ R$ ${libLocal.formatReal(cartao.avista)} ${(cartao.avista/cartao.total*100).toPrecision(2)}%</pre>`);
+    cartao.parcelado > 0 && linhas.push(`<pre>🔢 R$ ${libLocal.formatReal(cartao.parcelado)} ${(cartao.parcelado/cartao.total*100).toPrecision(2)}%</pre>`);
+    cartao.recorrente > 0 && linhas.push(`<pre>🔁 R$ ${libLocal.formatReal(cartao.recorrente)} ${(cartao.recorrente/cartao.total*100).toPrecision(2)}%</pre>`);
     linhas.push(`<pre>🧮 R$ ${libLocal.formatReal(cartao.total)}</pre>`);
     linhas.push('');
 
@@ -41,9 +41,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     !cartao.competencia && pendencias.push(`❗️ Define a competência do cartão ${cartao.nome}`);
   }
 
-  linhas.push(`1️⃣ À vista R$ ${libLocal.formatReal(totais.avista)} <pre>${(totais.avista/totais.geral*100).toPrecision(2)}%</pre>`);
-  linhas.push(`🔢 Parcelado R$ ${libLocal.formatReal(totais.parcelado)} <pre>${(totais.parcelado/totais.geral*100).toPrecision(2)}%</pre>`);
-  linhas.push(`🔁 Recorrente R$ ${libLocal.formatReal(totais.recorrente)} <pre>${(totais.recorrente/totais.geral*100).toPrecision(2)}%</pre>`);
+  linhas.push(`<pre>1️⃣ À vista R$ ${libLocal.formatReal(totais.avista)} ${(totais.avista/totais.geral*100).toPrecision(2)}%</pre>`);
+  linhas.push(`<pre>🔢 Parcelado R$ ${libLocal.formatReal(totais.parcelado)} ${(totais.parcelado/totais.geral*100).toPrecision(2)}%</pre>`);
+  linhas.push(`<pre>🔁 Recorrente R$ ${libLocal.formatReal(totais.recorrente)} ${(totais.recorrente/totais.geral*100).toPrecision(2)}%</pre>`);
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(totais.geral)}`);
 
   callback(linhas);
