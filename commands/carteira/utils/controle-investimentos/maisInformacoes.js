@@ -9,6 +9,7 @@ const exec = async ({ callback, lib, libLocal, parametros }) => {
     const dataHoje = new Date();
     const linhas = [doc.id];
     const totais = {
+      cotas: 0,
       ativo: 0,
       encerrado: 0,
       contadorAtivo: 0,
@@ -30,9 +31,10 @@ const exec = async ({ callback, lib, libLocal, parametros }) => {
       totais.contadorEncerrado += encerrado ? 1 : 0;
       totais.ativo += !encerrado ? valor : 0;
       totais.encerrado += encerrado ? valor : 0;
+      totais.cotas += !encerrado ? cotas : 0;
 
       linhas.push(`<pre>${status} ${libLocal.formatData(datas.entrada._seconds*1000)}</pre>`);
-      linhas.push(`Valor: R$ ${libLocal.formatReal(valor)} ${cotas ? ` - ${cotas} cotas` : ''}`);
+      linhas.push(`Valor: R$ ${libLocal.formatReal(valor)} ${cotas ? ` - ${cotas} cotas a ${libLocal.formatReal(Math.ceil(valor/cotas))}` : ''}`);
       encerrado && linhas.push(`Valor saída: R$ ${libLocal.formatReal(valorSaida)} (Saldo ${libLocal.formatReal(valorSaida-valor)})`);
       datas.saida && linhas.push(`Vencimento: ${libLocal.formatData(datas.saida._seconds*1000)} (${diasParaVencimento} dias)`);
       rendimento && rendimento.tipo && rendimento.taxa && linhas.push(`Rendimento: ${rendimento.taxa} ${rendimento.tipo}`);
@@ -42,6 +44,7 @@ const exec = async ({ callback, lib, libLocal, parametros }) => {
 
     linhas.push(`✅ ativos ${totais.contadorAtivo} R$ ${libLocal.formatReal(totais.ativo)}`);
     linhas.push(`❌ encerrados ${totais.contadorEncerrado} R$ ${libLocal.formatReal(totais.encerrado)}`);
+    totais.contadorAtivo > 0 && totais.cotas > 0 && linhas.push(`Valor médio R$ ${libLocal.formatReal(Math.ceil(totais.ativo/totais.cotas))}`)
 
     callback(linhas);
   }
