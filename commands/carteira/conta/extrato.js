@@ -1,7 +1,10 @@
 const extrato = require('../dto/extrato.js');
 
 const exec = async ({ parametros, callback, lib, libLocal }) => {
-  const anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
+  let anoMes = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
+    ? parametros.shift()
+    : null;
+  const acaoCompetencia = parametros.length > 0 && parametros[0][0] === '+'
     ? parametros.shift()
     : null;
   const conta = !['-t', '-d'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
@@ -12,6 +15,16 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     feito: 0,
     previsto: 0,
   };
+
+  if (acaoCompetencia) {
+    const data = new Date();
+    const somar = parseInt(acaoCompetencia.substring(1));
+
+    data.setMonth(data.getMonth()+somar);
+    anoMes = data.getFullYear()*100+1+data.getMonth();
+
+    linhas.push(` -- ${anoMes} -- `);
+  }
 
   const contas = await extrato.exec({ anoMes, lib, conta });
 
