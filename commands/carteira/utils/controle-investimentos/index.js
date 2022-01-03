@@ -7,6 +7,5 @@ module.exports = getStruct({
   hasContext: true,
   restricted: false,
   commandWhenEmpty: 'st',
-  commandsShowList: ['st'],
   description: 'Controle de investimentos'
 });
