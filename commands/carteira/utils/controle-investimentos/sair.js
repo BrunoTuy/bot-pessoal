@@ -43,14 +43,15 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, original,
       const ativo = list.docs.find(l => id === l.id);
       const { lista } = ativo.data();
 
-      if (!ativo || lista.length > idx+1) {
+      if (!ativo || lista.length < idx+1) {
+        console.log('aaa', ativo, idx, lista);
         callback('Ativo não reconhecido.');
       } else if (['CDB', 'TESOURO'].includes(ativo.data().tipo)) {
         const docRef = lib.firebase.db.collection('cofre').doc(`${id}`);
 
         lista[idx].encerrado = true;
         lista[idx].datas.saida = libLocal.entenderData(data);
-        lista[idx].datas.valorSaida = libLocal.entenderValor({ val: valor, naoInverte: true });
+        lista[idx].valorSaida = libLocal.entenderValor({ val: valor, naoInverte: true });
 
         docRef.update({ lista });
 

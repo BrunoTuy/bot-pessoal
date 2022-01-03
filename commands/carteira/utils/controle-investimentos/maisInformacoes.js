@@ -15,7 +15,7 @@ const exec = async ({ callback, lib, libLocal, parametros }) => {
       contadorEncerrado: 0,
     };
 
-    data.lista.forEach(({ encerrado, datas, cotas, corretora, valor, rendimento }) => {
+    data.lista.forEach(({ encerrado, datas, cotas, corretora, valor, valorSaida, rendimento }) => {
       const dataVencimento = datas.saida
         ? new Date(datas.saida._seconds*1000)
         : null;
@@ -33,8 +33,9 @@ const exec = async ({ callback, lib, libLocal, parametros }) => {
 
       linhas.push(`<pre>${status} ${libLocal.formatData(datas.entrada._seconds*1000)}</pre>`);
       linhas.push(`Valor: R$ ${libLocal.formatReal(valor)} ${cotas ? ` - ${cotas} cotas` : ''}`);
+      encerrado && linhas.push(`Valor saída: R$ ${libLocal.formatReal(valorSaida)} (Saldo ${libLocal.formatReal(valorSaida-valor)})`);
       datas.saida && linhas.push(`Vencimento: ${libLocal.formatData(datas.saida._seconds*1000)} (${diasParaVencimento} dias)`);
-      rendimento && rendimento.tipo && rendimento.taxa && linhas.push(`Rendimento: ${rendimento.tipo} ${rendimento.taxa}`);
+      rendimento && rendimento.tipo && rendimento.taxa && linhas.push(`Rendimento: ${rendimento.taxa} ${rendimento.tipo}`);
       corretora && linhas.push(`Corretora: ${corretora}`);
       linhas.push(' ');
     });
