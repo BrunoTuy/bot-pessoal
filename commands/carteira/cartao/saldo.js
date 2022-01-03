@@ -16,7 +16,12 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     recorrente: 0
   };
 
-  const cartoes = await cartaoExtrato.exec({ lib, competencia, somenteAtivo: true });
+  const cartoes = await cartaoExtrato.exec({
+    lib,
+    competencia,
+    somenteAtivo: true,
+    competenciaAtual: !competencia
+  });
 
   for (const cartao of cartoes) {
     totais.geral += cartao.total;

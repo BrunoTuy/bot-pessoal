@@ -1,4 +1,4 @@
-const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, tags, dataTotal, somenteAtivo }) => {
+const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: cartaoNome, lib, tags, dataTotal, somenteAtivo }) => {
   const { db } = lib.firebase;
   const cartoes = [];
   const cartoesCollection = somenteAtivo
@@ -18,7 +18,7 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, ta
       let faturaCollection = tags && tags.length > 0
         ? dbCollection
             .where('tags', 'array-contains-any', tags)
-        : dataTotal || !competencia
+        : dataTotal || (!competencia && !competenciaAtual)
           ? dbCollection
           : dbCollection
               .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
@@ -29,7 +29,7 @@ const exec = async ({ competencia, dataMin, dataMax, cartao: cartaoNome, lib, ta
           .where('data', '<=', dataMax.getTime());
       }
 
-      if (competencia) {
+      if (competencia || competenciaAtual) {
         faturaCollection = faturaCollection
           .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
       }
