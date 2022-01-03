@@ -1,20 +1,37 @@
 const buscarMovimento = require('./_buscarMovimento.js');
 
-const exec = async ({ callback, parametros, lib, subComando }) => {
+const exec = async ({ callback, parametros, lib, subComando, original, bot }) => {
   const { db } = lib.firebase;
-  if (parametros.length < 3) {
-    const list = await db.collection('fp').get();
-    const linhas = list.docs.map(i => `${i.id} ${i.data().descritivo}`);
+  const list = await db.collection('fp').get();
 
-    linhas.push('');
-    linhas.push('Para cadastrar ou remover débitos use:');
-    linhas.push(`<pre>${subComando} {codigo financiamento} +/-d {dm/codigo conta} {codigo movimento}</pre>`);
-    linhas.push('');
-    linhas.push('Para cadastrar ou remover creditos use:');
-    linhas.push(`<pre>${subComando} {codigo financiamento} +/-c {dm/codigo conta} {codigo movimento}</pre>`);
-    linhas.push('');
-    linhas.push('Para alterar o descritivo:');
-    linhas.push(`<pre>${subComando} {codigo financiamento} d {texto}</pre>`);
+  if (parametros.length < 1) {
+    const linhas = list.docs.map(i => ([{
+      text: i.data().descritivo,
+      callback_data: `${subComando} ${i.id}`
+    }]));
+
+    bot.sendMessage( original.chat.id, 'Editar financiamento', {
+      reply_to_message_id: original.message_id,
+      reply_markup: JSON.stringify({
+        inline_keyboard: linhas
+      })
+    });
+  } else if (parametros.length < 3) {
+    const linhas = [];
+    const financiamentoId = parametros.shift();
+
+    if (list.docs.filter(({ id }) => id === financiamentoId)) {
+      linhas.push('Para cadastrar ou remover débitos use:');
+      linhas.push(`<pre>${subComando} ${financiamentoId} +/-d {dm/codigo conta} {codigo movimento}</pre>`);
+      linhas.push('');
+      linhas.push('Para cadastrar ou remover creditos use:');
+      linhas.push(`<pre>${subComando} ${financiamentoId} +/-c {dm/codigo conta} {codigo movimento}</pre>`);
+      linhas.push('');
+      linhas.push('Para alterar o descritivo:');
+      linhas.push(`<pre>${subComando} ${financiamentoId} d {texto}</pre>`);
+    } else {
+      linhas.push('Nenhum financiamento com o código informado.');
+    }
 
     callback(linhas);
   } else {
