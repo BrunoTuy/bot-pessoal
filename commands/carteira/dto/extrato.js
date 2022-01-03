@@ -47,6 +47,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
       continue;
     }
 
+    const { separada } = conta.data();
     let feito = 0;
     let previsto = 0;
     const extratoLista = [];
@@ -74,8 +75,10 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
       extratoLista.push({...i.data(), id: i.id});
     }
 
-    totais.feito += feito;
-    totais.previsto += previsto;
+    if (!separada) {
+      totais.feito += feito;
+      totais.previsto += previsto;
+    }
 
     lista.push({
       ...conta.data(),
