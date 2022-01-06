@@ -55,6 +55,6 @@ const exec = async ({ callback, lib, libLocal }) => {
 };
 
 module.exports = {
-  alias: ['l'],
+  alias: ['st'],
   exec,
 };

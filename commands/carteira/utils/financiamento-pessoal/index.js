@@ -6,5 +6,6 @@ module.exports = getStruct({
   label: '-- Tuy financeira tools --',
   hasContext: true,
   restricted: false,
+  commandWhenEmpty: 'st',
   description: 'Financiamento pessoal'
 });
