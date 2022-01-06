@@ -74,15 +74,15 @@ const exec = async ({ callback, lib, libLocal }) => {
   const totalAplicado = totalGeral.CDB + totalGeral.TESOURO + totalGeral.FII;
 
   linhas.push('');
-  linhas.push(`<pre>1️⃣ até 90d  R$ ${libLocal.formatReal(totalGeral.primeiro)}</pre>`);
-  linhas.push(`<pre>2️⃣ até 180d R$ ${libLocal.formatReal(totalGeral.segundo)}</pre>`);
-  linhas.push(`<pre>3️⃣ até 270d R$ ${libLocal.formatReal(totalGeral.terceiro)}</pre>`);
-  linhas.push(`<pre>4️⃣ até 365d R$ ${libLocal.formatReal(totalGeral.quarto)}</pre>`);
-  linhas.push(`<pre>⏩ 1ano+    R$ ${libLocal.formatReal(totalGeral.longo)}</pre>`);
+  linhas.push(`<pre>1️⃣ até 90d  ${(totalGeral.primeiro/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.primeiro)}</pre>`);
+  linhas.push(`<pre>2️⃣ até 180d ${(totalGeral.segundo/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.segundo)}</pre>`);
+  linhas.push(`<pre>3️⃣ até 270d ${(totalGeral.terceiro/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.terceiro)}</pre>`);
+  linhas.push(`<pre>4️⃣ até 365d ${(totalGeral.quarto/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.quarto)}</pre>`);
+  linhas.push(`<pre>⏩ 1ano+    ${(totalGeral.longo/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.longo)}</pre>`);
   linhas.push('');
-  linhas.push(`<pre>🇧🇷 Tesouro ${(totalGeral.TESOURO/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.TESOURO)}</pre>`);
-  linhas.push(`<pre>🏦 CDB     ${(totalGeral.CDB/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.CDB)}</pre>`);
-  linhas.push(`<pre>🏢 FII     ${(totalGeral.FII/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.FII)}</pre>`);
+  linhas.push(`<pre>🇧🇷 Tesouro  ${(totalGeral.TESOURO/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.TESOURO)}</pre>`);
+  linhas.push(`<pre>🏦 CDB      ${(totalGeral.CDB/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.CDB)}</pre>`);
+  linhas.push(`<pre>🏢 FII      ${(totalGeral.FII/totalAplicado*100).toPrecision(2)}% R$ ${libLocal.formatReal(totalGeral.FII)}</pre>`);
   linhas.push('');
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(totalAplicado)}`);
 
