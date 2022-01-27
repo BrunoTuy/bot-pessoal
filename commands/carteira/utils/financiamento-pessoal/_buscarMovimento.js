@@ -1,11 +1,30 @@
 const buscarMovimento = async (lib, conta, movimento) => {
   const { db } = lib.firebase;
-  const docRef = conta === 'dm'
-    ? db.collection('dinheiro').doc(movimento)
-    : db.collection('contas').doc(conta).collection('extrato').doc(movimento);
-  const docData = (await docRef.get()).data();
+  let docRef;
+  let docData;
 
-  if (docData === 'undefined') {
+  if (conta === 'dm') {
+    docRef = db.collection('dinheiro').doc(movimento);
+    docData = (await docRef.get()).data();
+  } else {
+    const ccRef = db.collection('contas').doc(conta);
+    const ccData = (await ccRef.get()).data();
+
+    if (!ccData || ccData === 'undefined') {
+      const cdRef = db.collection('cartoes').doc(conta);
+      cdData = (await cdRef.get()).data();
+
+      if (cdData) {
+        docRef = cdRef.collection('fatura').doc(movimento);
+        docData = (await docRef.get()).data();
+      }
+    } else {
+      docRef = ccRef.collection('extrato').doc(movimento);
+      docData = (await docRef.get()).data();
+    }
+  }
+
+  if (!docData || docData === 'undefined') {
     return false;
   } else {
     return {
