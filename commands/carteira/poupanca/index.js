@@ -2,7 +2,7 @@ const getStruct = require('../../../lib/pathIndex');
 
 module.exports = getStruct({
   dir: __dirname,
-  alias: ['pp'],
+  alias: ['po'],
   label: '-- Poupança --',
   description: 'Poupança'
 });

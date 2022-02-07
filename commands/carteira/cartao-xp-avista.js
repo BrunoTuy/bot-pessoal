@@ -16,13 +16,13 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       callback,
       libLocal,
       subComando,
-      parametros: ['br', 1, data, valor, descritivo]
+      parametros: ['xp', 1, data, valor, descritivo]
     });
   }
 };
 
 module.exports = {
-  alias: ['ia'],
+  alias: ['xp'],
   exec,
-  descricao: 'Compra avista no cartão Petrobras'
+  descricao: 'Compra avista no cartão XP'
 };
