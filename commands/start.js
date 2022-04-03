@@ -16,6 +16,6 @@ const exec = ({ original, callback, cmds }) => {
 };
 
 module.exports = {
-  ocultar: true,
+  hidden: true,
   exec
 };
