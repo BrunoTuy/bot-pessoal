@@ -1,4 +1,4 @@
-const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal, somenteAtivo }) => {
+const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal, somenteAtivo, naoSeparar }) => {
   const lista = [];
   const totais = {
     feito: 0,
@@ -75,7 +75,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
       extratoLista.push({...i.data(), id: i.id});
     }
 
-    if (!separada) {
+    if (naoSeparar || !separada) {
       totais.feito += feito;
       totais.previsto += previsto;
     }
