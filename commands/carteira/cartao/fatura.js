@@ -12,10 +12,8 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   const parametrosTexto = parametros.join(' ');
   const mostrarTags = !libLocal.capturarParametro(parametrosTexto, 't');
   const mostrarDescricao = !libLocal.capturarParametro(parametrosTexto, 'd');
-  const totalPorTags = libLocal.capturarParametro(parametrosTexto, 'tt');
   const linhas = [];
   let total = 0;
-  const ttGeral = {};
 
   linhas.push(`------ ${competencia} ------`);
 
@@ -26,7 +24,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   data.setSeconds(0);
 
   for (const cartao of cartoes) {
-    const tt = {};
     cartao.fatura.length > 0 && linhas.push(`💳 ${cartao.nome.toUpperCase()}`);
     for (const i of cartao.fatura) {
       const dataEvento = new Date(i.data);
@@ -57,36 +54,14 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
           ? '🔢'
           : '1️⃣';
 
-      if (totalPorTags) {
-        i.tags.forEach(t => {
-          if (['a', 'c'].includes(totalPorTags.toLowerCase())) {
-            if (!tt[t]) {
-              tt[t] = 0;
-            }
-
-            tt[t] += i.valor;
-          }
-
-          if (['a', 't'].includes(totalPorTags.toLowerCase())) {
-            if (!ttGeral[t]) {
-              ttGeral[t] = 0;
-            }
-
-            ttGeral[t] += i.valor;
-          }
-        });
-      }
-
       linhas.push(`<pre>${status} ${tipo} ${libLocal.formatData(i.data, 'mes-dia')} R$ ${libLocal.formatReal(i.valor)}${parcelas || ''} ${tags || '-'} ${descricao || ''}</pre>`);
     }
 
-    Object.entries(tt).forEach(([name, value]) => linhas.push(`🏳 ${name} R$ ${libLocal.formatReal(value)}`));
     total += cartao.total;
     cartao.fatura.length > 0 && linhas.push(`🧮 R$ ${libLocal.formatReal(cartao.total)}`);
     cartao.fatura.length > 0 && linhas.push('');
   }
 
-  Object.entries(ttGeral).forEach(([name, value]) => linhas.push(`🏴 ${name} R$ ${libLocal.formatReal(value)}`));
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(total)}`);
 
   callback(linhas);
