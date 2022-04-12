@@ -56,7 +56,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
       ? dbCollection.where('tags', 'array-contains-any', tags)
       : dbCollection;
 
-    if (dataMin && dataMax) {
+    if (!dataTotal && dataMin && dataMax) {
       extratoCollection = extratoCollection
         .where('data', '>=', dataMin.getTime())
         .where('data', '<=', dataMax.getTime());
