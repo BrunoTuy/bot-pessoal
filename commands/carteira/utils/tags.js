@@ -84,7 +84,7 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
     const data = new Date(atualizado);
 
     Object.entries(tags).sort((a, b) => a[0] < b[0] ? -1 : 1).forEach(l => {
-      linhas.push(`<pre>${l[0]}</pre> CC ${l[1].cc} - CD ${l[1].cd} - DM ${l[1].dm}`)
+      linhas.push(`<pre>🏦 ${l[1].cc < 10 ? '0' : ''}${l[1].cc} 💳 ${l[1].cd < 10 ? '0' : ''}${l[1].cd} 💸 ${l[1].dm < 10 ? '0' : ''}${l[1].dm} &lt;${l[0]}&gt;</pre>`)
     });
 
     linhas.push('');
