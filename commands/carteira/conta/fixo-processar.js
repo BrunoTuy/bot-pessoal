@@ -1,7 +1,7 @@
 const consultaRecorrentes = require('../dto/contasRecorrentes.js');
 const contaAdd = require('./add.js');
 
-const correrLista = async ({ lista, insert, ano, mes, db }) => {
+const correrLista = async ({ lista, insert, ano, mes, db, somente }) => {
   let contador = 0;
   const data = new Date();
 
@@ -10,8 +10,8 @@ const correrLista = async ({ lista, insert, ano, mes, db }) => {
       let idx = 0;
       const { dia, valor, descritivo, tags } = rec;
       const cadastro = {
-        ano: data.getFullYear(),
-        mes: data.getMonth()+1
+        ano: somente ? ano : data.getFullYear(),
+        mes: somente ? mes : data.getMonth()+1
       };
 
       while (cadastro.ano < ano || (cadastro.ano == ano && cadastro.mes <= mes)) {
@@ -80,15 +80,16 @@ const correrLista = async ({ lista, insert, ano, mes, db }) => {
 };
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
-  if (parametros.length !== 2) {
+  if (parametros.length < 2) {
     callback([
       'Você tem que informar mes e ano limite para processamento',
-      `${subComando} {ano} {mes}`
+      `${subComando} {ano} {mes} [somente]`
     ]);
   } else {
     let contador = 0;
     const ano = parametros.shift();
     const mes = parametros.shift();
+    const somente = !!parametros.shift();
     const lista = await consultaRecorrentes.exec({ lib });
     const { db } = lib.firebase;
 
@@ -96,6 +97,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       db,
       ano,
       mes,
+      somente,
       lista,
       insert: ({ data, recorrente, nome, valor, descritivo, tags }) => {
         contaAdd.exec({
