@@ -22,7 +22,9 @@ const enviar = require( './lib/enviarMensagemBot.js' )( bot );
 const banco = require( './lib/banco.js' )( firebase );
 
 const messageProcess = async ( msg, text ) => {
-  console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, msg.from.username, text );
+  const user = msg.from;
+
+  console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, user.username, text );
 
   const allowed = (process.env.CHAT_ALLOWED || '').split(',').includes(msg.chat.id.toString());
   const commands = {};
@@ -44,7 +46,7 @@ const messageProcess = async ( msg, text ) => {
   if ( !comando || typeof commands[comando] === 'undefined' || commands[comando].exec  === 'undefined' )
   {
     const resposta = [
-      `Oi ${msg.from.first_name}`,
+      `Oi ${user.first_name}`,
       'O comando digitado não foi reconhecido',
       '',
       'Tente:'
@@ -64,6 +66,7 @@ const messageProcess = async ( msg, text ) => {
     commands[comando].exec({
       bot,
       cmds: commands,
+      user,
       comando,
       contexto,
       parametros,
