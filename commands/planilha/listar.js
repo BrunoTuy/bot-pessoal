@@ -4,6 +4,8 @@ const exec = async ({ callback, ...params }) => {
   const planilhas = await listaPlanilhas.exec(params);
   const linhas = [];
 
+  console.log('Lista', planilhas);
+
   for (const item of planilhas) {
     const { nome, id } = item;
 

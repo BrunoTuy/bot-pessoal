@@ -23,14 +23,16 @@ const exec = async ({ lib, callback, subComando, parametros, user }) => {
       : planilhas.find(({ id, nome }) => id === idDigitado || nome === nomeDigitado) || {};
 
     if (id) {
-      const docRef = await lib.firebase.db.collection('planilhas').doc(id);
-
       linhas.push({
         criadaEm: new Date(),
         criadaPor: user.id
       });
 
-      docRef.update({ linhas });
+      lib.banco.update({
+        id,
+        colecao: 'planilhas',
+        set: { linhas }
+      });
 
       callback([
         `Linha ${linhas.length} na planilha <u>${nome}</u>`,
