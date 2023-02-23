@@ -9,6 +9,7 @@ const port = process.env.PORT || 5000;
 const TOKEN = process.env.TOKEN_TELEGRAM;
 const commandList = require( './commands' );
 const firebase = require('./lib/firebase.js');
+const b = require( './lib/banco.js' );
 
 const bot = new TelegramBot( TOKEN, { polling: process.env.NODE_ENV !== 'production' } );
 
@@ -19,9 +20,9 @@ if (process.env.NODE_ENV === 'production') {
 const app = express();
 
 const enviar = require( './lib/enviarMensagemBot.js' )( bot );
-const banco = require( './lib/banco.js' )( firebase );
 
 const messageProcess = async ( msg, text ) => {
+  const banco = await b(process.env);
   const user = msg.from;
 
   console.log( msg.message_id, ( msg.chat.type === 'private' ? 'PVT' : 'GRP' ), msg.chat.id, user.username, text );
