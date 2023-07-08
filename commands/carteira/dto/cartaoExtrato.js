@@ -1,72 +1,72 @@
-const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: cartaoNome, lib, tags, dataTotal, somenteAtivo }) => {
-  const { db } = lib.firebase;
+const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: cartaoNome, lib: { banco: { list } }, tags, dataTotal, somenteAtivo }) => {
   const cartoes = [];
-  const cartoesCollection = somenteAtivo
-    ? db.collection('cartoes').where('ativo', '==', true)
-    : db.collection('cartoes');
-  const cartoesList = await cartoesCollection.get();
+  const filtroCartoes = {};
 
-  for (const cartao of cartoesList.docs) {
-    if ((!cartaoNome || cartaoNome === cartao.data().nome) && (competencia || cartao.data().competencia || (dataMin && dataMax))) {
-      let total = 0;
-      let parcelado = 0;
-      let recorrente = 0;
-      let avista = 0;
-      const fatura = [];
-      const dbCollection = db.collection('cartoes').doc(cartao.id).collection('fatura');
+  if (somenteAtivo) {
+    filtroCartoes.ativo = true;
+  }
+  if (cartaoNome) {
+    filtroCartoes.nome = cartaoNome;
+  }
 
-      let faturaCollection = tags && tags.length > 0
-        ? dbCollection
-            .where('tags', 'array-contains-any', tags)
-        : dataTotal || (!competencia && !competenciaAtual)
-          ? dbCollection
-          : dbCollection
-              .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
+  const cartoesBanco = await list({
+    colecao: 'cartoes',
+    filtro: filtroCartoes
+  });
 
-      if (!dataTotal && dataMin && dataMax) {
-        faturaCollection = faturaCollection
-          .where('data', '>=', dataMin.getTime())
-          .where('data', '<=', dataMax.getTime());
-      }
+  for (const cartao of cartoesBanco) {
+    let total = 0;
+    let parcelado = 0;
+    let recorrente = 0;
+    let avista = 0;
+    const fatura = [];
 
-      if (competencia || competenciaAtual) {
-        faturaCollection = faturaCollection
-          .where('competencia', '==', parseInt(competencia || cartao.data().competencia));
-      }
+    const filtroExtrato = {};
 
-      const list = await faturaCollection
-          .orderBy('data')
-          .get();
+    if (tags && tags.length > 0) {
+      filtroExtrato.tags = { $in: tags };
+    } else if (!dataTotal || competencia || competenciaAtual) {
+      filtroExtrato.competencia = parseInt(competencia || cartao.competencia);
+    }
 
-      for (const i of list.docs) {
-        const ehRecorrente = i.data().recorrente && i.data().recorrente !== null && i.data().recorrente.id;
+    if (dataMin && dataMax) {
+      filtroExtrato.data = { $gte: dataMin.getTime(), $lte: dataMax.getTime() };
+    }
 
-        total += parseInt(i.data().valor);
-        recorrente += ehRecorrente ? parseInt(i.data().valor) : 0;
-        parcelado += !ehRecorrente && i.data().total_parcelas > 1 ? parseInt(i.data().valor) : 0;
-        avista += !ehRecorrente && i.data().total_parcelas === 1 ? parseInt(i.data().valor) : 0;
+    const extrato = await list({
+      colecao: 'cartoes_extrato',
+      filtro: filtroExtrato,
+      ordem: { data: 1 }
+    });
 
-        fatura.push({
-          ...i.data(),
-          id: i.id,
-          tipo: ehRecorrente
-            ? 'recorrente'
-            : i.data().total_parcelas > 1
-              ? 'parcelado'
-              : 'avista'
-        });
-      }
+    for (const mov of extrato) {
+      const ehRecorrente = mov.recorrente && mov.recorrente !== null && mov.recorrente.id;
 
-      cartoes.push({
-        ...cartao.data(),
-        id: cartao.id,
-        fatura,
-        total,
-        parcelado,
-        recorrente,
-        avista
+      total += parseInt(mov.valor);
+      recorrente += ehRecorrente ? parseInt(mov.valor) : 0;
+      parcelado += !ehRecorrente && mov.total_parcelas > 1 ? parseInt(mov.valor) : 0;
+      avista += !ehRecorrente && mov.total_parcelas === 1 ? parseInt(mov.valor) : 0;
+
+      fatura.push({
+        ...mov,
+        id: mov._id,
+        tipo: ehRecorrente
+          ? 'recorrente'
+          : mov.total_parcelas > 1
+            ? 'parcelado'
+            : 'avista'
       });
     }
+
+    cartoes.push({
+      ...cartao,
+      id: cartao._id,
+      fatura,
+      total,
+      parcelado,
+      recorrente,
+      avista
+    });
   }
 
   return cartoes;

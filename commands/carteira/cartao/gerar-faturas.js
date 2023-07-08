@@ -1,13 +1,13 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const exec = async ({ parametros, callback, lib, libLocal }) => {
+const exec = async ({ parametros, callback, lib: { banco: { get, insert, update } }, libLocal }) => {
   if (parametros.length !== 2) {
     callback && callback([
       'Necessário informar competencia e cartão'
       `${subComando} {competencia} {nome do cartão}`
      ]);
   } else {
-    const { db } = lib.firebase;
+    const colecao = 'contas_extrato';
     const competencia = parametros.shift()
     const cartaoNome = parametros.shift()
     const ano = competencia.toString().substring(0, 4);
@@ -28,8 +28,9 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
         data.setFullYear(ano);
         data.setMonth(parseInt(mes)-1, cartao.vencimento);
 
-        const docRef = db.collection('contas').doc(cartao.banco).collection('extrato').doc(`${cartao.id}.${competencia}`);
-        docRef.set({
+        const id = `${cartao.id}.${competencia}`;
+        const registro = { _id: id };
+        const dados = {
           data: data.getTime(),
           dataTexto: data,
           valor: parseInt(cartao.total*-1),
@@ -39,7 +40,18 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
             cartao: cartao.id,
             competencia
           }
-        });
+        };
+
+        const itemBanco = await get({ colecao, registro });
+
+        if (itemBanco) {
+          await update({ colecao, registro, set: dados });
+        } else {
+          await insert({ colecao, dados: {
+            ...registro,
+            ...dados
+          } });
+        }
       }
     }
 

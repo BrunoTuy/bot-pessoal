@@ -1,21 +1,18 @@
-const exec = async ({ lib }) => {
+const exec = async ({ lib: { banco: { list } } }) => {
   const lista = [];
-  const { db } = lib.firebase;
-  const cartoes = await db.collection('cartoes').get();
+  const cartoes = await list({
+    colecao: 'cartoes',
+    filtro: { ativo: true }
+  });
 
-  for (const cartao of cartoes.docs) {
-    const recorrentes = await db.collection('cartoes').doc(cartao.id).collection('recorrente').orderBy('dia').get();
-    const obj = {
-      ...cartao.data(),
-      id: cartao.id,
-      lista: []
-    };
+  for (const cartao of cartoes) {
+    const { recorrente } = cartao;
   
-    for (const rec of recorrentes.docs) {
-      obj.lista.push({...rec.data(), id: rec.id});
-    }
-
-    lista.push(obj);
+    lista.push({
+      ...cartao,
+      id: cartao._id,
+      lista: recorrente
+    });
   }
 
   return lista;

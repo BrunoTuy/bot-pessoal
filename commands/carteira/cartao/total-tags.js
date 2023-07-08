@@ -1,7 +1,6 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
-  const { db } = lib.firebase;
   const data = new Date();
   const competencia = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
@@ -45,10 +44,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(total)}`);
 
   callback(linhas);
-}
+};
 
 module.exports = {
   alias: ['tt'],
   descricao: 'Total faturas tags',
   exec,
-}
+};

@@ -1,20 +1,12 @@
-const exec = async ({ lib, params, callback }) => {
-  const { cartao, data, valor, descritivo, parcela, parcelas, competencia, recorrente, tags } = params;
-  const obj = await lib.firebase.db.collection('cartoes').doc(cartao).collection('fatura');
-  const retorno = await obj.add({
-    descritivo,
-    competencia,
-    dataTexto: data,
-    tags: tags || [],
-    data: data.getTime(),
-    valor: parseInt(valor),
-    parcela: parseInt(parcela) || 1,
-    total_parcelas: parseInt(parcelas) || 1,
-    recorrente: recorrente || null
+const exec = async ({ lib: { banco: { insert } }, params: dados, callback }) => {
+  const { cartaoId, data, valor, descritivo, parcela, parcelas, competencia, recorrente, tags } = dados;
+  const retorno = await insert({ 
+    colecao: 'cartoes_extrato',
+    dados
   });
 
   callback && callback([
-    `${cartao} ${retorno.id} $ ${valor/100} ${parcela ? `${parcela}/${parcelas}` : ''}`,
+    `${cartaoId} ${retorno} $ ${valor/100} ${parcela ? `${parcela}/${parcelas}` : ''}`,
     `${recorrente ? recorrente.id : ''} ${descritivo}`,
     `${competencia} ${data}`,
     `${(tags || []).map(t => `[${t}]`).join(' ')}`

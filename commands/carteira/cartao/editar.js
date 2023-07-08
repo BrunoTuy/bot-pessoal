@@ -1,6 +1,6 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib: { banco: { get, update } }, libLocal }) => {
   if (parametros.length === 1) {
     const linhas = [];
     let faturasVazias = true;
@@ -48,7 +48,8 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     const tipoDado = parametros.shift().toString().toLowerCase();
     const dado = parametros.join(' ').trim();
     const objSet = {};
-    const docRef = db.collection('cartoes').doc(cartaoId).collection('fatura').doc(faturaId);
+    const colecao = 'cartoes_extrato';
+    const registro = { cartaoId, _id: faturaId };
 
     if (tipoDado === 'data') {
       const dataSet = libLocal.entenderData(dado.toString().toLowerCase());
@@ -72,8 +73,8 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     } else if (tipoDado === 'descritivo') {
       objSet.descritivo = dado;
     } else if (tipoDado === 'tags') {
-      const doc = await docRef.get();
-      const tags = doc.data().tags || [];
+      const doc = await get({ colecao, registro });
+      const tags = doc.tags || [];
       const operacao = dado.substring(0, 1);
       const tag = dado.substring(1).trim();
 
@@ -97,7 +98,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     }
 
     if (objSet !== {}) {
-      docRef.update(objSet);
+      await update(({ colecao, registro, set: objSet }));
       callback('Registro atualizado com sucesso.');
     }
   } else {

@@ -1,6 +1,7 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+  const { banco: { get, remove } } = lib;
   if (parametros.length === 1) {
     const linhas = [];
     let faturasVazias = true;
@@ -39,17 +40,19 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 
     callback(linhas);
   } else if (parametros.length === 2) {
-    const { db } = lib.firebase;
     const cartaoId = parametros.shift();
     const faturaId = parametros.shift();
+    const colecao = 'cartoes_extrato';
+    const registro = { cartaoId, _id: faturaId };
 
-    const docRef = db.collection('cartoes').doc(cartaoId).collection('fatura').doc(faturaId);
-    const doc = await docRef.get();
+    const item = await get({ colecao, registro });
 
-    if (doc.data()) {
-      const { data, valor, descritivo, recorrente, tags, total_parcelas, competencia, parcela } = doc.data();
+    console.log('---- item', { colecao, registro, item });
 
-      await docRef.delete();
+    if (item) {
+      const { data, valor, descritivo, recorrente, tags, total_parcelas, competencia, parcela } = item;
+
+      await remove({ colecao, registro });
 
       callback([
         `Cartão ${cartaoId} Movimento ${faturaId}`,

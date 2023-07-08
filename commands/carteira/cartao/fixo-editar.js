@@ -1,9 +1,10 @@
 const consultaRecorrentes = require('../dto/cartoesRecorrentes.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+  const fixo = await consultaRecorrentes.exec({ lib });
+
   if (parametros.length < 4) {
     const linhas = [];
-    const fixo = await consultaRecorrentes.exec({ lib });
 
     for (const cartao of fixo) {
       const { nome } = cartao;
@@ -26,33 +27,33 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
     callback(linhas);
   } else {
-    const { db } = lib.firebase;
+    const { update } = lib.banco;
     const contaId = parametros.shift();
     const recorrenteId = parametros.shift();
     const tipoDado = parametros.shift().toString().toLowerCase();
     const dado = parametros.join(' ').trim();
     const objSet = {};
-    const docRef = db.collection('cartoes').doc(contaId).collection('recorrente').doc(recorrenteId);
+    const { lista } = fixo.find(({ id }) => id === contaId);
+    const item = lista.find(({ id }) => id === recorrenteId);
 
     if (tipoDado === 'dia') {
-      objSet.dia = parseInt(dado);
+      item.dia = parseInt(dado);
     } else if (tipoDado === 'valor') {
-      objSet.valor = dado.substring(dado.length-1) === 'c'
+      item.valor = dado.substring(dado.length-1) === 'c'
         ? dado.substring(0, dado.length-1)
         : dado*-1;
     } else if (tipoDado === 'descritivo') {
-      objSet.descritivo = dado;
+      item.descritivo = dado;
     } else if (tipoDado === 'tags') {
-      const doc = await docRef.get();
-      const tags = doc.data().tags || [];
+      const tags = item.tags || [];
       const operacao = dado.substring(0, 1);
       const tag = dado.substring(1).trim();
 
       if (operacao === '-') {
-        objSet.tags = tags.filter(t => t.toLowerCase() !== tag.toLowerCase());
+        item.tags = tags.filter(t => t.toLowerCase() !== tag.toLowerCase());
       } else if (operacao === '+') {
-        objSet.tags = tags;
-        objSet.tags.push(tag);
+        item.tags = tags;
+        item.tags.push(tag);
       } else {
         callback([
           'Parâmetros incorretos.',
@@ -61,16 +62,17 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
         ]);        
       }
     } else {
-      callback([
+      return callback([
         'Parâmetros incorretos.',
         'Você pode alterar data, valor, descritivo e tags'
       ]);
     }
 
-    if (objSet !== {}) {
-      docRef.update(objSet);
-      callback('Registro atualizado com sucesso.');
-    }
+    await update(({
+      colecao: 'cartoes',
+      registro: { _id: contaId },
+      set: { recorrente: lista } }));
+    callback('Registro atualizado com sucesso.');
   }
 }
 

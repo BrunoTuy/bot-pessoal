@@ -1,7 +1,7 @@
 const inserir = require('../dto/inserirCartaoFatura.js');
 const faturas = require('./gerar-faturas.js');
 
-const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib: { banco }, libLocal }) => {
   if (!parametros || parametros.length < 5) {
     callback([
       'Exemplo do comando abaixo',
@@ -13,20 +13,21 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     const data = libLocal.entenderData(parametros.shift());
     const valor = libLocal.entenderValor({ val: parametros.shift(), cartao: true });
     const { descritivo, tags } = parametros && libLocal.entenderDescritivoTags(parametros.join(" "));
-    const { db } = lib.firebase;
 
     if (parcelas > 12) {
       callback(`Tem algo errado nesse número de parcelas. ${parcelas}x`);
     } else {
-      const cartoes = db.collection('cartoes');
-      const queryRef = cartoes.where('nome', '==', cartao);
-      const cartoesGet = await queryRef.get();
+      const item = await banco.get({
+        colecao: 'cartoes',
+        registro: { nome: cartao }
+      });
 
-      if (cartoesGet.size !== 1) {
+      console.log('Cartao encontrado', item);
+
+      if (!item) {
         callback('Cartão não cadastrado.');
       } else {
-        const cartaoDoc = cartoesGet.docs[0];
-        const { competencia: competenciaInicial } = cartaoDoc.data();
+        const { competencia: competenciaInicial, _id: cartaoId } = item;
 
         if (!competenciaInicial) {
           callback(`O cartão ${cartao} esta sem competência definida.`);
@@ -37,10 +38,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
             dataCartao.setMonth(data.getMonth()+parcela-1);
 
             inserir({
-              lib,
+              lib: { banco },
               callback,
               params: {
-                cartao: cartaoDoc.id,
+                cartaoId,
                 data: dataCartao,
                 valor,
                 descritivo,
@@ -52,7 +53,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
             });
 
             faturas.exec({
-              lib,
+              lib: { banco },
               libLocal,
               parametros: [competencia, cartao]
             });

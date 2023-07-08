@@ -1,4 +1,4 @@
-const exec = async ({ subComando, parametros, callback, lib }) => {
+const exec = async ({ subComando, parametros, callback, lib: { banco: { get, update } } }) => {
   if (parametros.length < 4) {
     callback([
       'Exemplo do comando abaixo',
@@ -9,25 +9,30 @@ const exec = async ({ subComando, parametros, callback, lib }) => {
     const dia = parseInt(parametros.shift());
     const valor = parseInt(parametros.shift());
     const descritivo = parametros.join(' ');
-    const { db } = lib.firebase;
-    const queryRef = db.collection('cartoes').where('nome', '==', cartao);
-    const cartoesGet = await queryRef.get();
+    const colecao = 'cartoes';
+    const registro = { cartaoId, _id: faturaId };
+    const item = await get({ colecao, registro: { nome: cartao } });
 
-    if (cartoesGet.size !== 1) {
+    if (item) {
       callback(`Cartão ${cartao} não cadastrado.`);
     } else {
-      const cartaoDoc = cartoesGet.docs[0];
-      const obj = await db.collection('cartoes').doc(cartaoDoc.id).collection('recorrente');
+      const { recorrente } = item;
 
-      obj && obj.add({
+      recorrente.push({
         dia,
         valor,
         descritivo
       });
 
+      await update({
+        colecao,
+        registro: { _id: item._id },
+        set: { recorrente }
+      });
+
       callback([
         'Cadastrado',
-        `${cartaoDoc.data().nome} - ${descritivo}`,
+        `${item.nome} - ${descritivo}`,
         `Dia ${dia}`,
         `R$ ${valor/100}`
       ]);

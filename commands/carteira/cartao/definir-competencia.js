@@ -1,11 +1,10 @@
-const exec = async ({ parametros, subComando, callback, lib }) => {
+const exec = async ({ parametros, subComando, callback, lib: { banco: { list, update } } }) => {
   if (parametros.length != 2) {
     callback([
       'Para editar a competêcia use',
       `${subComando} {nome do cartão} {nova competencia}`
     ]);
   } else {
-    const { db } = lib.firebase;
     const cartaoNome = parametros.shift()
     const competencia = parametros.shift()
     const ano = competencia.toString().substring(0, 4);
@@ -17,16 +16,19 @@ const exec = async ({ parametros, subComando, callback, lib }) => {
     } else {
       let mudou = false;
       let competenciaAntiga = null;
-      const cartoes = await db.collection('cartoes').get();
+      const colecao = 'cartoes';
 
-      for (const cartao of cartoes.docs) {
-        const d = cartao.data();
+      const cartoes = await list({ colecao, filtro: { ativo: true } });
 
+      for (const d of cartoes) {
         if (d.nome.toLowerCase() === cartaoNome.toLowerCase()) {
           competenciaAntiga = d.competencia;
-          const docRef = db.collection('cartoes').doc(cartao.id);
 
-          docRef.update({ competencia });
+          await update({
+            colecao,
+            registro: { _id: d._id },
+            set: { competencia }
+          });
 
           mudou = true;
         }

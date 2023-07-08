@@ -1,8 +1,9 @@
 const consultaRecorrentes = require('../dto/cartoesRecorrentes.js');
 const cartaoAdd = require('../dto/inserirCartaoFatura.js');
 const faturas = require('./gerar-faturas.js');
+const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const correrLista = async ({ lista, insert, ano, mes, db }) => {
+const correrLista = async ({ lista, insert, ano, mes, banco }) => {
   let contador = 0;
   const data = new Date();
 
@@ -37,13 +38,16 @@ const correrLista = async ({ lista, insert, ano, mes, db }) => {
 
         const dataMax = dataBuscar.getTime();
 
-        const queryRef = db.collection('cartoes').doc(item.id).collection('fatura')
-          .where('recorrente', '==', rec)
-          .where('data', '>=', dataMin)
-          .where('data', '<=', dataMax);
-        const verificarGet = await queryRef.get();
+        const cartoes = await cartaoExtrato.exec({
+          lib: { banco },
+          cartao: item.nome,
+          dataMin,
+          dataMax
+        });
 
-        if (verificarGet.size < 1) {
+        const verificarGet = cartoes.fatura.find(({ recorrente }) => recorrente && recorrente.id === rec.id);
+
+        if (!verificarGet) {
           const dataA = new Date();
 
           dataA.setFullYear(cadastro.ano)
@@ -92,10 +96,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     const ano = parametros.shift();
     const mes = parametros.shift();
     const lista = await consultaRecorrentes.exec({ lib });
-    const { db } = lib.firebase;
+    const { banco } = lib.firebase;
 
     contador += await correrLista({ 
-      db,
+      banco,
       ano,
       mes,
       lista,
