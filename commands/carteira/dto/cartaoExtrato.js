@@ -21,7 +21,7 @@ const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: c
     let avista = 0;
     const fatura = [];
 
-    const filtroExtrato = {};
+    const filtroExtrato = { cartaoId: cartao._id };
 
     if (tags && tags.length > 0) {
       filtroExtrato.tags = { $in: tags };
@@ -70,6 +70,6 @@ const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: c
   }
 
   return cartoes;
-}
+};
 
-module.exports = { exec }
+module.exports = { exec };
