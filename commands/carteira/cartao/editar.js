@@ -1,6 +1,7 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const exec = async ({ subComando, parametros, callback, lib: { banco: { get, update } }, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+  const { get, update } = lib.banco;
   if (parametros.length === 1) {
     const linhas = [];
     let faturasVazias = true;
