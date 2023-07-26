@@ -9,7 +9,8 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
     if (!dinheiroM) {
       await insert({ colecao, dados: {
         _id: dinFire.id,
-        ...dinFire.data()
+        ...dinFire.data(),
+        import: true
       } });
     }
   }

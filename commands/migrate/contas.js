@@ -3,9 +3,14 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
   const contasFirebase = await db.collection('contas').get();
   const contasMongo = await list({ colecao });
 
+  const dataMax = new Date();
+  dataMax.setDate(dataMax.getDate() + 731);
+
+  callback('Importação do contas iniciada.');
+
   for (const contaFire of contasFirebase.docs) {
     const recorrentesFire = await db.collection('contas').doc(contaFire.id).collection('recorrente').get();
-    const extratoFire = await db.collection('contas').doc(contaFire.id).collection('extrato').get();
+    const extratoFire = await db.collection('contas').doc(contaFire.id).collection('extrato').where('data', '<=', dataMax.getTime()).get();
     const contaM = contasMongo.find(({ _id }) => _id.toString() === contaFire.id);
     const recorrente = [];
 
@@ -13,11 +18,18 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
       recorrente.push({...rec.data(), id: rec.id});
     }
 
+    callback([
+      `Conta ${contaFire.data().banco}`,
+      `Recorrentes: ${recorrentesFire.docs.length}`,
+      `Extrato: ${extratoFire.docs.length}`
+    ]);
+
     if (!contaM) {
       await insert({ colecao, dados: {
         _id: contaFire.id,
         ...contaFire.data(),
-        recorrente
+        recorrente,
+        import: true
       } });
     } else {
       await update({
@@ -44,6 +56,7 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
             _id: mov.id,
             contaId: contaFire.id,
             ...mov.data(),
+            import: true
           }
         });
       }

@@ -3,9 +3,14 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
   const cartoesFirebase = await db.collection('cartoes').get();
   const cartoesMongo = await list({ colecao });
 
+  const dataMax = new Date();
+  dataMax.setDate(dataMax.getDate() + 731);
+
+  callback('Importação do cartão iniciada.');
+
   for (const cartaoFire of cartoesFirebase.docs) {
     const recorrentesFire = await db.collection('cartoes').doc(cartaoFire.id).collection('recorrente').get();
-    const extratoFire = await db.collection('cartoes').doc(cartaoFire.id).collection('fatura').get();
+    const extratoFire = await db.collection('cartoes').doc(cartaoFire.id).collection('fatura').where('data', '<=', dataMax.getTime()).get();
     const cartaoM = cartoesMongo.find(({ _id }) => _id.toString() === cartaoFire.id);
     const recorrente = [];
 
@@ -13,11 +18,18 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
       recorrente.push({...rec.data(), id: rec.id});
     }
 
+    callback([
+      `Cartão ${cartaoFire.data().nome}`,
+      `Recorrentes: ${recorrentesFire.docs.length}`,
+      `Extrato: ${extratoFire.docs.length}`
+    ]);
+
     if (!cartaoM) {
       await insert({ colecao, dados: {
         _id: cartaoFire.id,
         ...cartaoFire.data(),
-        recorrente
+        recorrente,
+        import: true
       } });
     } else {
       await update({
@@ -38,12 +50,13 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
       const movMongo = extratoMongo.find(({ _id }) => _id.toString() === mov.id);
 
       if (!movMongo) {
-        await insert({ 
+        await insert({
           colecao: 'cartoes_extrato',
           dados: {
             _id: mov.id,
             cartaoId: cartaoFire.id,
             ...mov.data(),
+            import: true
           }
         });
       }

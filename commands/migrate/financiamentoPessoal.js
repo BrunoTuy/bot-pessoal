@@ -9,7 +9,8 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
     if (!fMongo) {
       await insert({ colecao, dados: {
         _id: fFire.id,
-        ...fFire.data()
+        ...fFire.data(),
+        import: true
       } });
     }
   }
