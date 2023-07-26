@@ -42,11 +42,12 @@ const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, 
       });
     }
 
+    const extratoMongo = await list({
+      colecao: 'cartoes_extrato',
+      filtro: { cartaoId: cartaoFire.id }
+    });
+
     for (const mov of extratoFire.docs) {
-      const extratoMongo = await list({
-        colecao: 'cartoes_extrato',
-        filtro: { cartaoId: cartaoFire.id }
-      });
       const movMongo = extratoMongo.find(({ _id }) => _id.toString() === mov.id);
 
       if (!movMongo) {
