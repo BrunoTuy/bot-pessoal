@@ -1,4 +1,4 @@
-const consultaRecorrentes = require('../dto/contasRecorrentes.js');
+const consultaRecorrentes = "require('../dto/contasRecorrentes.js')";
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (parametros.length < 4) {
