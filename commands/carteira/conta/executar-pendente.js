@@ -1,7 +1,9 @@
+const listaContas = require('../dto/contaListar.js');
+const extrato = require('../dto/extrato.js');
 const editar = require('../dto/contaEditar.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal, original, bot }) => {
-  const { db } = lib.firebase;
+  const { banco: { list } } = lib;
 
   if (parametros.length === 2) {
     const contaId = parametros.shift();
@@ -24,23 +26,26 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, original,
     data.setSeconds(59);
     data.setMilliseconds(999);
 
-    const contas = await db.collection('contas').get();
-    for (const conta of contas.docs) {
-      const extrato = await db.collection('contas').doc(conta.id).collection('extrato')
-        .where('data', '<=', data.getTime())
-        .where('status', 'in', ['previsto', 'previsto fixo'])
-        .orderBy('data')
-        .get();
+    const contas = await listaContas.exec({ list, somenteAtivo: true });
 
-      for (const i of extrato.docs) {
-        const { data, status, valor, descritivo } = i.data();
+    for (const conta of contas) {
+      const extratoConta = await extrato.exec({
+        lib,
+        conta,
+        dataMin: null,
+        dataMax: data,
+        filtroExtrato: { status: {$in: ['previsto', 'previsto fixo'] } }
+      });
+
+      for (const i of extratoConta.lista[0].extrato) {
+        const { data, status, valor, descritivo } = i;
         const formatStatus = status === 'previsto fixo'
           ? 'PF'
           : 'PC'
 
         linhas.push([{
-          text: `${conta.data().banco.toUpperCase()} ${libLocal.formatData(data)} ${formatStatus} R$ ${libLocal.formatReal(valor)} ${descritivo}`,
-          callback_data: `cc xp ${conta.id} ${i.id}`
+          text: `${conta.banco.toUpperCase()} ${libLocal.formatData(data)} ${formatStatus} R$ ${libLocal.formatReal(valor)} ${descritivo}`,
+          callback_data: `cc xp ${conta._id} ${i.id}`
         }]);
       }
     }

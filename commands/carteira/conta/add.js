@@ -1,4 +1,6 @@
-const exec = async ({ subComando, parametros, callback, lib, libLocal, parametrosObj }) => {
+const listaContas = require('../dto/contaListar.js');
+
+const exec = async ({ subComando, parametros, callback, lib: { banco: { list, insert } }, libLocal, parametrosObj }) => {
   if ((!parametros || parametros.length < 4) && !parametrosObj) {
     callback([
       'Exemplo do comando abaixo',
@@ -21,20 +23,12 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
         ? libLocal.entenderDescritivoTags(parametrosObj.descritivo)
         : parametros &&libLocal.entenderDescritivoTags(parametros.join(" "));
       const recorrente = parametrosObj && parametrosObj.recorrente ? parametrosObj.recorrente : null;
-      const { db } = lib.firebase;
 
-      let queryRef = db.collection('contas').where('banco', '==', conta);
-      let contasGet = await queryRef.get();
+      const contas = await listaContas.exec({ list, contaNome: conta, somenteAtivo: true });
 
-      if (contasGet.size !== 1) {
-        queryRef = db.collection('contas').where('sigla', '==', conta);
-        contasGet = await queryRef.get();
-      }
-
-      if (contasGet.size !== 1) {
+      if (contas.length !== 1) {
         callback('Conta não cadastrada.');
       } else {
-        const contaDoc = contasGet.docs[0];
         const status = parametrosObj && parametrosObj.status
           ? parametrosObj.status
           : (dataAgora.getFullYear() > data.getFullYear()
@@ -43,9 +37,10 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
             ? 'feito'
             : 'previsto';
 
-        const obj = await db.collection('contas').doc(contaDoc.id).collection('extrato');
+        const { _id: contaId } = contas[0];
 
-        const retorno = await obj.add({
+        const dados = {
+          contaId,
           data: data.getTime(),
           dataTexto: data,
           valor: parseInt(valor),
@@ -53,6 +48,11 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           status,
           recorrente,
           tags,
+        };
+
+        const id = await insert({ 
+          colecao: 'contas_extrato',
+          dados
         });
 
         callback([
@@ -60,12 +60,12 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, parametro
           `Em ${data}`,
           `R$ ${valor/100}`,
           `${(tags || []).map(t => `[${t.trim()}]`).join(' ')}`,
-          `✅ Inserido ${contaDoc.id} ${retorno.id}`
+          `<pre>✅ Inserido ${contaId} ${id}</pre>`
         ]);
 
         return {
-          conta: contaDoc.id,
-          movimento: retorno.id,
+          conta: contaId,
+          movimento: id,
         };
       }
     }

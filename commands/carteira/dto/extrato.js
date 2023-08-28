@@ -1,14 +1,18 @@
-const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal, somenteAtivo, naoSeparar }) => {
+const listaContas = require('./contaListar.js');
+
+const exec = async ({ anoMes, lib: { banco: { list } }, conta: contaParam, contaNome, dataMin: paramDataMin, dataMax: paramDataMax, tags, dataTotal, somenteAtivo, naoSeparar, filtroExtrato }) => {
   const lista = [];
   const totais = {
     feito: 0,
     previsto: 0,
   };
 
-  const dataMin = paramDataMin || new Date();
+  let dataMin = paramDataMin || new Date();
   const dataMax = paramDataMax || new Date();
 
-  if (!paramDataMin && !dataTotal) {
+  if (paramDataMin === null) {
+    dataMin = paramDataMin;
+  } else if (!paramDataMin && !dataTotal) {
     if (anoMes) {
       dataMin.setFullYear(anoMes.toString().substring(0, 4))
       dataMin.setMonth(anoMes.toString().substring(4)-1, 1);
@@ -36,43 +40,48 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
     dataMax.setDate(dataMax.getDate()-1);
   }
 
-  const { db } = lib.firebase;
-  const contasCollection = somenteAtivo
-    ? db.collection('contas').where('ativa', '==', true)
-    : db.collection('contas');
-  const contas = await contasCollection.get();
+  const contas = contaParam
+    ? [contaParam]
+    : await listaContas.exec({ list, contaNome, somenteAtivo });
 
-  for (const conta of contas.docs) {
-    if (contaNome && contaNome !== conta.data().banco && contaNome !== conta.data().sigla) {
-      continue;
-    }
-
-    const { separada } = conta.data();
+  for (const conta of contas) {
+    const { separada } = conta;
     let feito = 0;
     let previsto = 0;
     const extratoLista = [];
-    const dbCollection = db.collection('contas').doc(conta.id).collection('extrato');
-    let extratoCollection = tags && tags.length > 0
-      ? dbCollection.where('tags', 'array-contains-any', tags)
-      : dbCollection;
+    const filtro = filtroExtrato || {}
 
-    if (!dataTotal && dataMin && dataMax) {
-      extratoCollection = extratoCollection
-        .where('data', '>=', dataMin.getTime())
-        .where('data', '<=', dataMax.getTime());
+    filtro.contaId = conta._id;
+
+    if (tags && tags.length > 0) {
+      filtro.tags = { $in: tags };
     }
 
-    const extrato = await extratoCollection
-      .orderBy('data')
-      .get();
+    if (!dataTotal && (dataMin || dataMax)) {
+      filtro.data = {};
 
-    for (const i of extrato.docs) {
-      const { data, status, valor, descritivo } = i.data();
+      if (dataMin) {
+        filtro.data.$gte = dataMin.getTime();
+      }
+
+      if (dataMax) {
+        filtro.data.$lte = dataMax.getTime();
+      }
+    }
+
+    const extrato = await list({
+      colecao: 'contas_extrato',
+      filtro,
+      ordem: { data: 1 }
+    });
+
+    for (const i of extrato) {
+      const { data, status, valor, descritivo } = i;
 
       feito += status === 'feito' ? parseInt(valor) : 0;
       previsto += status !== 'feito' ? parseInt(valor) : 0;
 
-      extratoLista.push({...i.data(), id: i.id});
+      extratoLista.push({...i, id: i._id});
     }
 
     if (naoSeparar || !separada) {
@@ -81,8 +90,8 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
     }
 
     lista.push({
-      ...conta.data(),
-      id: conta.id,
+      ...conta,
+      id: conta._id,
       feito,
       previsto,
       extrato: extratoLista
@@ -92,7 +101,7 @@ const exec = async ({ anoMes, lib, conta: contaNome, dataMin: paramDataMin, data
   return {
     totais,
     lista
-  }
+  };
 };
 
 module.exports = { exec };

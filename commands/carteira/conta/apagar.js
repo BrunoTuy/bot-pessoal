@@ -38,15 +38,18 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 
     callback(linhas);
   } else if (parametros.length === 2) {
-    const { db } = lib.firebase;
+    const { get, remove } = lib.banco;
     const contaId = parametros.shift();
     const movimentoId = parametros.shift();
 
-    const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(movimentoId);
-    const doc = await docRef.get();
+    const filtro = {
+      colecao: "contas_extrato",
+      registro: { contaId, _id: movimentoId }
+    };
+    const item = await get(filtro);
 
-    if (doc.data()) {
-      const { data, valor, descritivo, recorrente, tags } = doc.data();
+    if (item) {
+      const { data, valor, descritivo, recorrente, tags } = item;
 
       callback([
         `Conta ${contaId} Movimento ${movimentoId}`,
@@ -56,7 +59,7 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
         `Recorrente ${recorrente ? 'Sim' : 'Não'}`,
       ]);
 
-      await docRef.delete();
+      await remove(filtro);
 
       callback('✅ Removido');
     } else {
@@ -75,4 +78,4 @@ module.exports = {
   alias: ['del'],
   descricao: 'Apagar',
   exec,
-}
+};

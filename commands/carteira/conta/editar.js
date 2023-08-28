@@ -42,13 +42,11 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
 
     callback(linhas);
   } else if (parametros.length >= 4) {
-    const { db } = lib.firebase;
     const contaId = parametros.shift();
     const extratoId = parametros.shift();
     const tipoDado = parametros.shift().toString().toLowerCase();
     const dado = parametros.join(' ').trim();
     const objSet = {};
-    const docRef = db.collection('contas').doc(contaId).collection('extrato').doc(extratoId);
 
     if (tipoDado === 'data') {
       const dataSet = libLocal.entenderData(dado.toString().toLowerCase());
@@ -62,8 +60,9 @@ const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) 
     } else if (tipoDado === 'descritivo') {
       objSet.descritivo = dado;
     } else if (tipoDado === 'tags') {
-      const doc = await docRef.get();
-      const tags = doc.data().tags || [];
+      const { get } = lib.banco;
+      const doc = await get({ colecao: "contas_extrato", registro: { contaId, _id: extratoId } });
+      const tags = doc.tags || [];
       const operacao = dado.substring(0, 1);
       const tag = dado.substring(1).trim();
 

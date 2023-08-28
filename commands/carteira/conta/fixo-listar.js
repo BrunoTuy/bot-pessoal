@@ -1,15 +1,15 @@
-const consultaRecorrentes = require('../dto/contasRecorrentes.js');
+const listaContas = require('../dto/contaListar.js');
 
-const exec = async ({ parametros, callback, lib, libLocal }) => {
+const exec = async ({ parametros, callback, lib: { banco: { list }}, libLocal }) => {
   const linhas = [];
-  const fixo = await consultaRecorrentes.exec({ lib });
+  const contas = await listaContas.exec({ list, somenteAtivo: true });
   let total = 0;
 
-  for (const conta of fixo) {
+  for (const conta of contas) {
     let totalConta = 0;
     const { banco } = conta;
   
-    for (const rec of conta.lista) {
+    for (const rec of conta.recorrente) {
       const { dia, valor, descritivo, tags } = rec;
 
       totalConta += valor;

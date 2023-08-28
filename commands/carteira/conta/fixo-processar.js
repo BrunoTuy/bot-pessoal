@@ -1,12 +1,13 @@
-const consultaRecorrentes = require('../dto/contasRecorrentes.js');
+const listaContas = require('../dto/contaListar.js');
+const extrato = require('../dto/extrato.js');
 const contaAdd = require('./add.js');
 
-const correrLista = async ({ lista, insert, ano, mes, db, somente }) => {
+const correrLista = async ({ contas, insert, ano, mes, lib, somente }) => {
   let contador = 0;
   const data = new Date();
 
-  for (const item of lista) {
-    for (const rec of item.lista) {
+  for (const item of contas) {
+    for (const rec of item.recorrente) {
       let idx = 0;
       const { dia, valor, descritivo, tags } = rec;
       const cadastro = {
@@ -36,13 +37,23 @@ const correrLista = async ({ lista, insert, ano, mes, db, somente }) => {
 
         const dataMax = dataBuscar.getTime();
 
-        const queryRef = db.collection('contas').doc(item.id).collection('extrato')
-          .where('recorrente', '==', rec)
-          .where('data', '>=', dataMin)
-          .where('data', '<=', dataMax);
-        const verificarGet = await queryRef.get();
+        // const queryRef = db.collection('contas').doc(item.id).collection('extrato')
+        //   .where('recorrente.id', '==', rec.id)
+        //   .where('data', '>=', dataMin)
+        //   .where('data', '<=', dataMax);
+        // const verificarGet = await queryRef.get();
 
-        if (verificarGet.size < 1) {
+        const extratoConta = await extrato.exec({
+          lib,
+          conta: item,
+          dataMin: new Date(dataMin),
+          dataMax: new Date(dataMax),
+          filtroExtrato: { 'recorrente.id': rec.id }
+        });
+
+        // if (verificarGet.size < 1) {
+        console.log('-- extrato', extratoConta);
+        if (extratoConta.lista[0].extrato.length < 1) {
           const dataA = new Date();
 
           dataA.setFullYear(cadastro.ano)
@@ -86,19 +97,19 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       `${subComando} {ano} {mes} [somente]`
     ]);
   } else {
+    const { banco: { list } } = lib;
     let contador = 0;
     const ano = parametros.shift();
     const mes = parametros.shift();
     const somente = !!parametros.shift();
-    const lista = await consultaRecorrentes.exec({ lib });
-    const { db } = lib.firebase;
+    const contas = await listaContas.exec({ list, somenteAtivo: true });
 
     contador += await correrLista({ 
-      db,
+      lib,
       ano,
       mes,
       somente,
-      lista,
+      contas,
       insert: ({ data, recorrente, nome, valor, descritivo, tags }) => {
         contaAdd.exec({
           lib,

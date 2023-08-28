@@ -7,7 +7,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const acaoCompetencia = parametros.length > 0 && parametros[0][0] === '+'
     ? parametros.shift()
     : null;
-  const conta = !['-t', '-d'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
+  const contaNome = !['-t', '-d'].includes((parametros[0] || '').toLowerCase()) ? parametros.shift() : null;
   const mostrarTags = !(parametros.includes('-t'));
   const mostrarDescricao = !(parametros.includes('-d'));
   const linhas = [];
@@ -26,7 +26,7 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     linhas.push(` -- ${anoMes} -- `);
   }
 
-  const contas = await extrato.exec({ anoMes, lib, conta });
+  const contas = await extrato.exec({ anoMes, lib, contaNome });
 
   for (const c of contas.lista) {
     c.extrato.length > 0 && linhas.push(`🏦 ${c.banco.toUpperCase()}`)

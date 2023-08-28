@@ -1,10 +1,12 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const exec = async ({ parametros, callback, lib: { banco: { get, insert, update } }, libLocal }) => {
+const exec = async ({ parametros, subComando, callback, lib, libLocal }) => {
+  const { get, insert, update } = lib.banco;
+
   if (parametros.length !== 2) {
     callback && callback([
-      'Necessário informar competencia e cartão'
-      `${subComando} {competencia} {nome do cartão}`
+      'Necessário informar competencia e cartão',
+      `<pre>${subComando} {competencia} {nome do cartão}</pre>`
      ]);
   } else {
     const colecao = 'contas_extrato';
@@ -28,9 +30,9 @@ const exec = async ({ parametros, callback, lib: { banco: { get, insert, update 
         data.setFullYear(ano);
         data.setMonth(parseInt(mes)-1, cartao.vencimento);
 
-        const id = `${cartao.id}.${competencia}`;
-        const registro = { _id: id };
+        const registro = { 'fatura.cartao': cartao.id, 'fatura.competencia': competencia };
         const dados = {
+          contaId: cartao.banco,
           data: data.getTime(),
           dataTexto: data,
           valor: parseInt(cartao.total*-1),
@@ -48,7 +50,6 @@ const exec = async ({ parametros, callback, lib: { banco: { get, insert, update 
           await update({ colecao, registro, set: dados });
         } else {
           await insert({ colecao, dados: {
-            ...registro,
             ...dados
           } });
         }
