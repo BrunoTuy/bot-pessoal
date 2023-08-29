@@ -2,7 +2,10 @@ const exec = async ({ lib: { banco: { insert } }, params: dados, callback }) => 
   const { cartaoId, data, valor, descritivo, parcela, parcelas, competencia, recorrente, tags } = dados;
   const retorno = await insert({ 
     colecao: 'cartoes_extrato',
-    dados
+    dados: {
+      ...dados,
+      data: data.getTime()
+    }
   });
 
   callback && callback([

@@ -22,7 +22,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
     linhas.push(`Data ${libLocal.formatData(data)}`);
 
-    const cartoes = await cartaoExtrato.exec({ dataMin, dataMax, lib });
+    const cartoes = await cartaoExtrato.exec({ dataMin, dataMax, dataTotal: true, lib });
 
     for (const c of cartoes) {
       for (const f of c.fatura) {
@@ -44,10 +44,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     const faturaId = parametros.shift();
     const colecao = 'cartoes_extrato';
     const registro = { cartaoId, _id: faturaId };
-
     const item = await get({ colecao, registro });
-
-    console.log('---- item', { colecao, registro, item });
 
     if (item) {
       const { data, valor, descritivo, recorrente, tags, total_parcelas, competencia, parcela } = item;
