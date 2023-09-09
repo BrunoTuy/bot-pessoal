@@ -17,9 +17,9 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
       linhas.push(`<pre>D.${dia} R$ ${libLocal.formatReal(valor)} ${descritivo} ${(tags || []).map(t => `[${t}]`).join(' ')}</pre>`);
     }
 
-    total += totalCartao;
-    totalCartao > 0 && linhas.push(`- ${nome.toUpperCase()} R$ ${libLocal.formatReal(totalCartao)}`);
-    totalCartao > 0 && linhas.push('');
+    total += parseInt(totalCartao);
+    totalCartao !== 0 && linhas.push(`- ${nome.toUpperCase()} R$ ${libLocal.formatReal(totalCartao)}`);
+    totalCartao !== 0 && linhas.push('');
   }
 
   linhas.push(`Total R$ ${total/100}`);
