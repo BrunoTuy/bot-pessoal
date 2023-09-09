@@ -39,9 +39,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     if (tipoDado === 'dia') {
       item.dia = parseInt(dado);
     } else if (tipoDado === 'valor') {
-      item.valor = dado.substring(dado.length-1) === 'c'
-        ? parseInt(dado.substring(0, dado.length-1)*-1)
-        : dado;
+      item.valor = parseInt(dado.substring(dado.length-1) === 'c'
+        ? dado.substring(0, dado.length-1)*-1
+        : dado);
     } else if (tipoDado === 'descritivo') {
       item.descritivo = dado;
     } else if (tipoDado === 'tags') {
