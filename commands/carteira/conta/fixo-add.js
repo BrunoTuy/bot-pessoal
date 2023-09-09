@@ -1,33 +1,41 @@
-const exec = async ({ subComando, parametros, callback, lib }) => {
+const listaContas = require('../dto/contaListar.js');
+
+const exec = async ({ subComando, parametros, callback, lib: { banco: { list, update, newId }} }) => {
   if (parametros.length < 4) {
     callback([
       'Exemplo do comando abaixo',
       `${subComando} {conta} {dia} {valor em centavos} {descritivo}`,
     ]);
   } else {
-    const conta = parametros.shift();
+    const contaNome = parametros.shift();
     const dia = parseInt(parametros.shift());
     const valor = parseInt(parametros.shift());
     const descritivo = parametros.join(' ');
-    const { db } = lib.firebase;
-    const queryRef = db.collection('contas').where('banco', '==', conta);
-    const contasGet = await queryRef.get();
 
-    if (contasGet.size !== 1) {
+    const contas = await listaContas.exec({ contaNome, list, somenteAtivo: true });
+
+    if (contas.length !== 1) {
       callback('Conta não cadastrada.');
     } else {
-      const contaDoc = contasGet.docs[0];
-      const obj = await db.collection('contas').doc(contaDoc.id).collection('recorrente');
+      const { _id: contaId, banco, recorrente } = contas.shift();
+      const listaRecorrente = recorrente || [];
 
-      obj && obj.add({
+      listaRecorrente.push({
+        id: newId(),
         dia,
         valor,
         descritivo
       });
 
+      await update(({
+        colecao: 'contas',
+        registro: { _id: contaId },
+        set: { recorrente: listaRecorrente }
+      }));
+
       callback([
         'Cadastrado',
-        `${contaDoc.data().banco} - ${descritivo}`,
+        `${banco} - ${descritivo}`,
         `Dia ${dia}`,
         `R$ ${valor/100}`
       ]);
