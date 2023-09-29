@@ -52,7 +52,7 @@ const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: c
         id: mov._id,
         tipo: ehRecorrente
           ? 'recorrente'
-          : mov.total_parcelas > 1
+          : (mov.total_parcelas > 1 || mov.parcelas > 1)
             ? 'parcelado'
             : 'avista'
       });
