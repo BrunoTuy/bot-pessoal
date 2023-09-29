@@ -39,7 +39,9 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
       const parcelas = i.total_parcelas > 1
         ? ` ${i.parcela}/${i.total_parcelas}`
-        : null;
+        : i.parcelas > 1
+          ? ` ${i.parcela}/${i.parcelas}`
+          : null;
 
       const tags = mostrarTags && i.tags && i.tags.length > 0
         ? i.tags.map(t => `[${t}]`).join(' ')
