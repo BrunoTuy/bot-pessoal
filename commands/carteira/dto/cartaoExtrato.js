@@ -40,19 +40,20 @@ const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: c
     });
 
     for (const mov of extrato) {
-      const ehRecorrente = mov.recorrente && mov.recorrente !== null && mov.recorrente.id;
+      const { valor, total_parcelas, parcelas, recorrente: objRecorrente } = mov;
+      const ehRecorrente = objRecorrente && objRecorrente !== null && objRecorrente.id;
 
-      total += parseInt(mov.valor);
-      recorrente += ehRecorrente ? parseInt(mov.valor) : 0;
-      parcelado += !ehRecorrente && mov.total_parcelas > 1 ? parseInt(mov.valor) : 0;
-      avista += !ehRecorrente && mov.total_parcelas === 1 ? parseInt(mov.valor) : 0;
+      total += parseInt(valor);
+      recorrente += ehRecorrente ? parseInt(valor) : 0;
+      parcelado += !ehRecorrente && (total_parcelas > 1 || parcelas > 1) ? parseInt(valor) : 0;
+      avista += !ehRecorrente && (total_parcelas === 1 || parcelas === 1) ? parseInt(valor) : 0;
 
       fatura.push({
         ...mov,
         id: mov._id,
         tipo: ehRecorrente
           ? 'recorrente'
-          : (mov.total_parcelas > 1 || mov.parcelas > 1)
+          : (total_parcelas > 1 || parcelas > 1)
             ? 'parcelado'
             : 'avista'
       });
