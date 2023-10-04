@@ -5,8 +5,8 @@ const exec = async ({ lib: { banco }, user }) => {
   });
 
   return planilhas.map(i => ({
-  	...i,
-  	id: i._id.toString()
+    ...i,
+    id: i._id.toString()
   }));
 };
 

@@ -1,7 +1,7 @@
 const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 
-const importar = async ( linha, callback ) => {
+const importar = async ( linha ) => {
   const arrEntrada = linha.split('|');
   const dataRegistro = new Date();
   const dataDigitada = arrEntrada[0];
@@ -72,7 +72,7 @@ module.exports = {
   restricted: true,
   hidden: true,
   context: true,
-  exec: async ({ callback, banco, comando, contexto, parametros, original }) => {
+  exec: async ({ callback, banco, contexto, parametros, original }) => {
     console.log('--- comando recebido', parametros);
     const primeiro = (parametros[0] || '').toLowerCase();
 
@@ -174,7 +174,7 @@ module.exports = {
         const registro = lista[indice];
         const resposta = ['Registro para ser editado:', ''];
 
-        for (key in registro) {
+        for (const key in registro) {
           if (key && key !== 'criado')
             resposta.push(`${key}: ${registro[key]}`);
         }

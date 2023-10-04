@@ -1,6 +1,6 @@
 const extrato = require('../dto/extrato.js');
 
-const exec = async ({ subComando, parametros, callback, banco, lib, libLocal }) => {
+const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (parametros.length === 1) {
     const linhas = [];
     let faturasVazias = true;

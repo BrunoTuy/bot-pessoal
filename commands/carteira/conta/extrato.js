@@ -11,10 +11,6 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   const mostrarTags = !(parametros.includes('-t'));
   const mostrarDescricao = !(parametros.includes('-d'));
   const linhas = [];
-  const totais = {
-    feito: 0,
-    previsto: 0,
-  };
 
   if (acaoCompetencia) {
     const data = new Date();

@@ -55,7 +55,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal, original,
     const doc = await docRef.get();
 
     if (doc.data()) {
-      const { data, valor, descritivo, recorrente, tags } = doc.data();
+      const { data, valor, descritivo, tags } = doc.data();
 
       callback([
         `Movimento ${movimentoId}`,

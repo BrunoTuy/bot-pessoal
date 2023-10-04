@@ -76,7 +76,7 @@ const exec = async ({ anoMes, lib: { banco: { list } }, conta: contaParam, conta
     });
 
     for (const i of extrato) {
-      const { data, status, valor, descritivo } = i;
+      const { status, valor } = i;
 
       feito += status === 'feito' ? parseInt(valor) : 0;
       previsto += status !== 'feito' ? parseInt(valor) : 0;

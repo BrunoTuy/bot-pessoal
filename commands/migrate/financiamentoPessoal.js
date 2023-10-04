@@ -1,4 +1,4 @@
-const exec = async ({ callback, lib: { firebase: { db }, banco: { insert, list, update } } }) => {
+const exec = async ({ lib: { firebase: { db }, banco: { insert, list } } }) => {
   const colecao = 'financiamento_pessoal';
   const fpFirebase = await db.collection('fp').get();
   const fpMongo = await list({ colecao });

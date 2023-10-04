@@ -1,6 +1,6 @@
 const consultaRecorrentes = require('../dto/cartoesRecorrentes.js');
 
-const exec = async ({ parametros, callback, lib, libLocal }) => {
+const exec = async ({ callback, lib, libLocal }) => {
   const linhas = [];
   const fixo = await consultaRecorrentes.exec({ lib });
   let total = 0;

@@ -1,11 +1,9 @@
 const cartaoExtrato = require('../dto/cartaoExtrato.js');
 
-const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
-  const data = new Date();
+const exec = async ({ parametros, callback, lib, libLocal }) => {
   const competencia = parametros.length > 0 && parametros[0].length === 6 && parametros[0] > 202101
     ? parametros.shift()
     : null;
-  const cartao = parametros.shift();
   const linhas = [];
   const pendencias = [];
   const totais = {

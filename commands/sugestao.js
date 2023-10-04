@@ -1,4 +1,4 @@
-const exec = ({ parametros, callback, config, bot, original }) => {
+const exec = ({ parametros, callback, bot, original }) => {
   if ( parametros.length === 0 ) {
     callback([
       'Para o envio de sugestoes coloque sua mensagem logo apos o comando',
