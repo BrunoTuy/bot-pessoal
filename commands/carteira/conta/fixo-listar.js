@@ -1,6 +1,6 @@
 const listaContas = require('../dto/contaListar.js');
 
-const exec = async ({ parametros, callback, lib: { banco: { list }}, libLocal }) => {
+const exec = async ({ callback, lib: { banco: { list }}, libLocal }) => {
   const linhas = [];
   const contas = await listaContas.exec({ list, somenteAtivo: true });
   let total = 0;

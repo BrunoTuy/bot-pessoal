@@ -12,7 +12,7 @@ const buscarMovimento = async (lib, conta, movimento) => {
 
     if (!ccData || ccData === 'undefined') {
       const cdRef = db.collection('cartoes').doc(conta);
-      cdData = (await cdRef.get()).data();
+      const cdData = (await cdRef.get()).data();
 
       if (cdData) {
         docRef = cdRef.collection('fatura').doc(movimento);

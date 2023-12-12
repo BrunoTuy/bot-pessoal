@@ -31,7 +31,6 @@ const exec = async ({ subComando, parametros, callback, lib: { banco: { list, up
     const recorrenteId = parametros.shift();
     const tipoDado = parametros.shift().toString().toLowerCase();
     const dado = parametros.join(' ').trim();
-    const objSet = {};
     const { recorrente } = contas.find(({ _id: id }) => id === contaId);
     const item = recorrente.find(({ id }) => id === recorrenteId);
 

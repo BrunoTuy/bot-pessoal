@@ -5,7 +5,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
       `${subComando} {data} {valor em centavos} {descritivo}`,
     ]);
   } else {
-    const dataAgora = new Date();
     const data = libLocal.entenderData(parametros.shift());
     const valor = libLocal.entenderValor({ val: parametros.shift() });
     const { descritivo, tags } = parametros && libLocal.entenderDescritivoTags(parametros.join(" "));

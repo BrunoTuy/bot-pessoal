@@ -17,7 +17,7 @@ const ajustarTag = (lista, operacao, tag, baseTag) => {
   return nLista;
 }
 
-const exec = async ({ parametros, callback, subComando, lib }) => {
+const exec = async ({ parametros, callback, lib }) => {
   if (parametros &&
       parametros.length > 0 &&
       (parametros.includes('-t') || parametros.includes('+t') || parametros.includes('=t'))
@@ -36,7 +36,7 @@ const exec = async ({ parametros, callback, subComando, lib }) => {
     const tag = arrTag.join(' ');
     const operacao = parametros.shift();
     const tagOperacao = parametros.join(' ').trim();
-    const buscarResumoTag = Object.entries(tags).find(([key, value]) => key === tag);
+    const buscarResumoTag = Object.entries(tags).find(([key]) => key === tag);
     const data = new Date(atualizado);
 
     linhas.push(`Indices atualizados em ${data}`);

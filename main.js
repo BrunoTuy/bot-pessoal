@@ -53,7 +53,7 @@ const messageProcess = async ( msg, text ) => {
       'Tente:'
     ];
 
-    for ( key in commands ) {
+    for ( const key in commands ) {
       if ( commands[key] && !commands[key].hidden )
       {
         resposta.push(`/${key}`);

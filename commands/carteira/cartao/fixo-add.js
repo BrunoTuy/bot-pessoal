@@ -10,7 +10,6 @@ const exec = async ({ subComando, parametros, callback, lib: { banco: { get, upd
     const valor = parseInt(parametros.shift());
     const descritivo = parametros.join(' ');
     const colecao = 'cartoes';
-    const registro = { cartaoId, _id: faturaId };
     const item = await get({ colecao, registro: { nome: cartao } });
 
     if (item) {

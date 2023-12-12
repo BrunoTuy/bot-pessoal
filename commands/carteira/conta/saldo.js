@@ -5,10 +5,6 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
     ? parametros.shift()
     : null;
   const linhas = [];
-  const totais = {
-    feito: 0,
-    previsto: 0,
-  };
 
   const contas = await extrato.exec({ anoMes, lib, somenteAtivo: true });
 
@@ -22,7 +18,6 @@ const exec = async ({ parametros, callback, lib, libLocal }) => {
   linhas.push(`🧮 Total R$ ${libLocal.formatReal(contas.totais.feito+contas.totais.previsto)}`);
 
   if (!anoMes) {
-    const data = new Date();
     const novoAnoMes = libLocal.calcularCompetencia({ parcela: 2 });
     const proximoMes = await extrato.exec({ anoMes: novoAnoMes, lib, somenteAtivo: true });
 

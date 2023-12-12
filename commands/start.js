@@ -6,7 +6,7 @@ const exec = ({ original, callback, cmds }) => {
     'Esses são os comandos que entendo:'
   ];
 
-  for ( key in cmds ) {
+  for ( const key in cmds ) {
     if ( cmds[key] && !cmds[key].hidden ) {
       resposta.push(`/${key}`);
     }

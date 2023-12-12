@@ -2,7 +2,7 @@ const listaContas = require('../dto/contaListar.js');
 const extrato = require('../dto/extrato.js');
 const editar = require('../dto/contaEditar.js');
 
-const exec = async ({ subComando, parametros, callback, lib, libLocal, original, bot }) => {
+const exec = async ({ parametros, callback, lib, libLocal, original, bot }) => {
   const { banco: { list } } = lib;
 
   if (parametros.length === 2) {

@@ -43,7 +43,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 
     callback(linhas);
   } else if (parametros.length >= 4) {
-    const { db } = lib.firebase;
     const cartaoId = parametros.shift();
     const faturaId = parametros.shift();
     const tipoDado = parametros.shift().toString().toLowerCase();

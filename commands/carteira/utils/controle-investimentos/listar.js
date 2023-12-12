@@ -1,4 +1,4 @@
-const exec = async ({ callback, parametros, lib, libLocal, bot, original }) => {
+const exec = async ({ parametros, lib, libLocal, bot, original }) => {
   const list = await lib.firebase.db.collection('cofre').get();
   const todos = ['t', 'todos'].includes(parametros.shift());
 
@@ -14,7 +14,7 @@ const exec = async ({ callback, parametros, lib, libLocal, bot, original }) => {
     }
   })
   .forEach((i, idx) => {
-    const { tipo, lista } = i.data();
+    const { lista } = i.data();
     const ativos = lista.filter(({ encerrado }) => !encerrado);
     const encerrados = lista.filter(({ encerrado }) => encerrado);
     const ativosTotal = ativos.reduce((a, { valor }) => a + valor, 0);

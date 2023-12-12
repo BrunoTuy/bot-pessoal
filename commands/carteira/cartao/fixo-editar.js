@@ -32,7 +32,6 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
     const recorrenteId = parametros.shift();
     const tipoDado = parametros.shift().toString().toLowerCase();
     const dado = parametros.join(' ').trim();
-    const objSet = {};
     const { lista } = fixo.find(({ id }) => id === contaId);
     const item = lista.find(({ id }) => id === recorrenteId);
 

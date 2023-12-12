@@ -82,7 +82,7 @@ const extrato = async ({ lib, callback }) => {
   });
 };
 
-const exec = async ({ comando, callback, lib, original }) => {
+const exec = async ({ callback, lib }) => {
   callback('Comunicar com o firestone');
 
   try {

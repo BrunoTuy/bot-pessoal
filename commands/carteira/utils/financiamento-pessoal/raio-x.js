@@ -11,7 +11,7 @@ const entenderStatus = ({ status }) =>
     ? '✅'
     : '🗓';
 
-const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
+const exec = async ({ callback, lib, libLocal }) => {
   const linhas = [];
   const tags = ['fp'];
   const contas = await extrato.exec({ lib, tags });

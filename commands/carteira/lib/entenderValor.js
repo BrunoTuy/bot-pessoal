@@ -5,8 +5,8 @@ const entenderValor = ({ val, cartao, naoInverte }) => {
     : strValor*-1;
 
   return cartao || naoInverte
-  	? parseInt(valor*-1)
-  	: parseInt(valor);
+    ? parseInt(valor*-1)
+    : parseInt(valor);
 }
 
 module.exports = entenderValor;

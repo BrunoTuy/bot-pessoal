@@ -1,4 +1,3 @@
-const buscarMovimento = require('./_buscarMovimento.js');
 const contaAdd = require('../../conta/add.js');
 const editar = require('./editar.js');
 

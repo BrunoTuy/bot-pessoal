@@ -13,7 +13,7 @@ const exec = async ({ callback, lib, libLocal }) => {
     };
 
   list.docs.forEach(i => {
-    const { ativo, tipo, lista } = i.data();
+    const { tipo, lista } = i.data();
     const totais = {
       primeiro: 0,
       segundo: 0,
@@ -22,7 +22,7 @@ const exec = async ({ callback, lib, libLocal }) => {
       longo: 0,
     };
 
-    lista.filter(({ encerrado }) => !encerrado).forEach(({ valor, datas, tipo }) => {
+    lista.filter(({ encerrado }) => !encerrado).forEach(({ valor, datas }) => {
       const dataHoje = new Date();
       const dataSaida = datas.saida
         ? new Date(datas.saida._seconds*1000)

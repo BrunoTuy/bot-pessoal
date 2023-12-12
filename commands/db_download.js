@@ -1,6 +1,4 @@
 const fs = require("fs");
-const request = require('request')
-
 
 const exec = ({ bot, callback, original }) => {
   callback('Enviando o arquivo');

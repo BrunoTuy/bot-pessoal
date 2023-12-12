@@ -1,4 +1,4 @@
-const exec = async ({ parametros, callback, subComando, lib, libLocal, bot, original }) => {
+const exec = async ({ parametros, callback, subComando, lib, libLocal }) => {
   const { db } = lib.firebase;
 
   if (parametros.length < 4) {
