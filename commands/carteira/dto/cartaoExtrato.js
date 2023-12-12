@@ -25,7 +25,9 @@ const exec = async ({ competencia, competenciaAtual, dataMin, dataMax, cartao: c
 
     if (tags && tags.length > 0) {
       filtroExtrato.tags = { $in: tags };
-    } else if (!dataTotal || competencia || competenciaAtual) {
+    }
+
+    if (!dataTotal || competencia || competenciaAtual) {
       filtroExtrato.competencia = parseInt(competencia || cartao.competencia);
     }
 
