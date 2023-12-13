@@ -1,4 +1,4 @@
-const cartaoAdd = require('./cartao/add.js');
+const cartaoAdd = require('./add.js');
 
 const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
   if (!parametros || parametros.length < 3) {
@@ -23,7 +23,7 @@ const exec = async ({ subComando, parametros, callback, lib, libLocal }) => {
 };
 
 module.exports = {
-  alias: ['cda'],
+  alias: ['av'],
   exec,
   descricao: 'Compra avista no cartão'
 };
